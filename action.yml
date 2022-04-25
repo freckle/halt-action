@@ -1,0 +1,11 @@
+name: "Action name"
+description: "Action description"
+author: "Freckle"
+inputs:
+  github-token:
+    description: "Override GitHub token, if necessary"
+    required: true
+    default: "${{ github.token }}"
+runs:
+  using: "node16"
+  main: "dist/index.js"
