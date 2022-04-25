@@ -1,21 +1,60 @@
-# TypeScript Action Template
+# Halt Action
 
-Our custom template repository for GitHub Actions implemented in TypeScript.
+Occasionally at Freckle, we need to ask Engineers to "halt the line" and hold
+off on merging PRs for a moment while we work through an issue in the deployment
+pipeline -- to avoid a series of merges piling up.
 
-[Creating a repository from a template][docs].
-
-[docs]: https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template
-
-**NOTE**: Be sure to look for strings like "TODO" or "Action name" and update
-them accordingly.
+Historically, this would be an update to a Slack topic and hope that everyone
+sees it. This Action is an experiment in improving that through automation.
 
 ## Usage
 
 ```yaml
-- uses: freckle/TODO-action@v1
+name: Halt
+
+on:
+  pull_request:
+  push:
+    branch: main
+
+jobs:
+  halt:
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ github.event_name == 'push' }}
+        uses: actions/checkout@v3 # needed for knowing changes in push
+
+      - uses: freckle/halt-action@v1
+        with: # all optional, defaults shown
+          default-branch: main
+          halt-file: .github/HALT
+          status-context: halt
+          status-target-url: null
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Inputs and Outputs
+## How it works
+
+**When you need to halt the line**:
+
+Commit a file to `main` at `.github/HALT`. The file can be blank, or contain a
+short message about why -- which will become the status description.
+
+This Action will see this addition and flip all open PRs to red. When the action
+runs on any PRs after that, as long as this file exists on `main`, those PRs
+will receive a red status.
+
+Make the configured `status-context` a _Required Status_ to actually "halt the
+line".
+
+**When you're ready to get moving**:
+
+Remove the file from `main`. This Action will see this removal and flip all open
+PRs to green. Typically, we'd do this in the same PR that fixes the issue (if it
+was caused by our code), so that things naturally begin moving again when the
+fix hits `main`.
+
+## Inputs & Outputs
 
 See [action.yml](./action.yml) for a complete list of inputs and outputs.
 

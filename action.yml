@@ -1,7 +1,23 @@
-name: "Action name"
-description: "Action description"
+name: "halt"
+description: |
+  Halt and un-halt open PRs by committing a file to your repository
 author: "Freckle"
 inputs:
+  default-branch:
+    description: "The branch on the halt file can be found"
+    require: true
+    default: "main"
+  halt-file:
+    description: "The path to the file used to halt"
+    require: true
+    default: ".github/HALT"
+  status-context:
+    description: "The context used when commit-statuses are created"
+    required: true
+    default: "halt"
+  status-target-url:
+    description: "An optional target-url for commit-statuses"
+    required: false
   github-token:
     description: "Override GitHub token, if necessary"
     required: true
