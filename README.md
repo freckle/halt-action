@@ -20,7 +20,8 @@ on:
 jobs:
   halt:
     runs-on: ubuntu-latest
-    steps: - if: ${{ github.event_type == 'push' }}
+    steps:
+      - if: ${{ github.event_name == 'push' }}
         uses: actions/checkout@v3         # needed for knowing changes in push
 
       - uses: freckle/halt-action@v1
