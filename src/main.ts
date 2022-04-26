@@ -26,7 +26,7 @@ async function run() {
       return await handlePullRequest(inputs, client, pullRequest);
     }
 
-    core.info("Ingoring non-default-branch, non-PullRequest Event");
+    core.info("Ignoring non-default-branch, non-PullRequest Event");
   } catch (error) {
     if (error instanceof Error) {
       core.error(error);
@@ -75,7 +75,7 @@ async function handlePullRequest(
     haltFile && "content" in haltFile ? atob(haltFile.content) : null;
 
   if (!haltFileContents) {
-    // Not in halted state
+    core.info("Repository not halted");
     return await unhaltPullRequest(client, github.context, inputs, pullRequest);
   }
 
@@ -86,10 +86,11 @@ async function handlePullRequest(
   );
 
   if (changes.removals.includes(inputs.haltFile)) {
-    // Halted state, but removed in this PR
+    core.info(`${inputs.defaultBranch}:${inputs.haltFile} exists, but removed`);
     return await unhaltPullRequest(client, github.context, inputs, pullRequest);
   }
 
+  core.info(`${inputs.defaultBranch}:${inputs.haltFile} exists`);
   await haltPullRequest(
     client,
     github.context,
