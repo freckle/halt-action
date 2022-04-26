@@ -45,16 +45,18 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
   const changes = await getChangesInPush();
 
   if (changes.additions.includes(inputs.haltFile)) {
-    core.info(`${inputs.haltFile} added in push to ${inputs.defaultBranch}`);
-    core.info("Halting all open PRs");
-    const description = fs.readFileSync(inputs.haltFile).toString().trim();
-    await haltOpenPullRequests(client, github.context, inputs, description);
+    core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} added`);
+    const message = haltMessage(fs.readFileSync(inputs.haltFile).toString());
+    core.info(`Halting all open PRs: ${message}`);
+    await haltOpenPullRequests(client, github.context, inputs, message);
+    core.endGroup();
   }
 
   if (changes.removals.includes(inputs.haltFile)) {
-    core.info(`${inputs.haltFile} removed in push to ${inputs.defaultBranch}`);
+    core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} removed`);
     core.info("Un-halting all open PRs");
     await unhaltOpenPullRequests(client, github.context, inputs);
+    core.endGroup();
   }
 }
 
@@ -70,7 +72,7 @@ async function handlePullRequest(
   });
 
   const haltFileContents =
-    haltFile && "content" in haltFile ? atob(haltFile.content).trim() : null;
+    haltFile && "content" in haltFile ? atob(haltFile.content) : null;
 
   if (!haltFileContents) {
     // Not in halted state
@@ -93,7 +95,7 @@ async function handlePullRequest(
     github.context,
     inputs,
     pullRequest,
-    haltFileContents === "" ? "Merges halted" : haltFileContents
+    haltMessage(haltFileContents)
   );
 }
 
@@ -101,7 +103,7 @@ async function haltOpenPullRequests(
   client: GitHubClient,
   context: Context,
   inputs: Inputs,
-  description: string
+  message: string
 ): Promise<void> {
   const pullRequests = await githubApi.listRepositoryPullRequests(client, {
     ...context.repo,
@@ -109,7 +111,7 @@ async function haltOpenPullRequests(
   });
 
   await pullRequests.forEach(async (pullRequest) => {
-    await haltPullRequest(client, context, inputs, pullRequest, description);
+    await haltPullRequest(client, context, inputs, pullRequest, message);
   });
 }
 
@@ -133,7 +135,7 @@ async function haltPullRequest(
   context: Context,
   inputs: Inputs,
   pullRequest: PullRequest,
-  description: string
+  message: string
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
@@ -141,7 +143,7 @@ async function haltPullRequest(
     sha: pullRequest.head.sha,
     context: inputs.statusContext,
     state: "failure",
-    description,
+    description: message,
     target_url: inputs.statusTargetUrl,
   });
 }
@@ -159,6 +161,10 @@ async function unhaltPullRequest(
     context: inputs.statusContext,
     state: "success",
   });
+}
+
+function haltMessage(contents: string): string {
+  return contents.trim() === "" ? "Merges halted" : contents.trim();
 }
 
 run();

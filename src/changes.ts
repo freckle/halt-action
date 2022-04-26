@@ -19,8 +19,6 @@ export type Changes = {
   removals: string[];
 };
 
-const NO_CHANGES = { additions: [], removals: [] };
-
 export async function getChangesInPush(): Promise<Changes> {
   // If we can't work out base we'll just use the most recent commit
   const base = github.context.payload.before;
@@ -34,7 +32,7 @@ export async function getChangesInPush(): Promise<Changes> {
 
 // exported for testing
 export function parseGitLog(stdout: string): Changes {
-  const regexp = /^(?<mod>A|D)\s*(?<path>.*)$/;
+  const regexp = /^(?<mode>A|D)\s*(?<path>.*)$/;
   const additions = [] as string[];
   const removals = [] as string[];
 
@@ -43,11 +41,11 @@ export function parseGitLog(stdout: string): Changes {
     .split(/\r?\n/)
     .forEach((ln) => {
       const m = regexp.exec(ln);
-      const mod = m?.groups?.mod;
+      const mode = m?.groups?.mode;
       const path = m?.groups?.path;
 
-      if (mod && path) {
-        switch (mod) {
+      if (mode && path) {
+        switch (mode) {
           case "A":
             if (!removals.includes(path)) {
               additions.push(path);
@@ -75,5 +73,19 @@ export async function getChangesInPullRequest(
     pull_number: pullRequest.number,
   });
 
-  return NO_CHANGES; // TODO
+  const additions = [] as string[];
+  const removals = [] as string[];
+
+  changes.forEach((change) => {
+    switch (change.status) {
+      case "added":
+        additions.push(change.filename);
+        break;
+      case "removed":
+        removals.push(change.filename);
+        break;
+    }
+  });
+
+  return { additions, removals };
 }

@@ -1,3 +1,5 @@
+import * as core from "@actions/core";
+
 export type Inputs = {
   defaultBranch: string;
   haltFile: string;
@@ -6,13 +8,12 @@ export type Inputs = {
   githubToken: string;
 };
 
-// TODO
 export function getInputs(): Inputs {
   return {
-    defaultBranch: "main",
-    haltFile: ".github/HALT",
-    statusContext: "halt",
-    statusTargetUrl: undefined,
-    githubToken: "",
+    defaultBranch: core.getInput("default-branch", { required: true }),
+    haltFile: core.getInput("halt-file", { required: true }),
+    statusContext: core.getInput("status-context", { required: true }),
+    statusTargetUrl: core.getInput("status-target-url", { required: false }),
+    githubToken: core.getInput("github-token", { required: true }),
   };
 }
