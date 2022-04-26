@@ -13,7 +13,15 @@ import type { PullRequest } from "./pull-request";
 
 async function run() {
   try {
+    core.startGroup("Inputs");
     const inputs = getInputs();
+    core.info(`defaultBranch: ${inputs.defaultBranch}`);
+    core.info(`haltFile: ${inputs.haltFile}`);
+    core.info(`statusContext: ${inputs.statusContext}`);
+    core.info(`statusTargetUrl: ${inputs.statusTargetUrl}`);
+    core.info(`githubToken: ${inputs.githubToken}`);
+    core.endGroup();
+
     const client = githubApi.getClient(inputs.githubToken);
 
     if (github.context.ref === inputs.defaultBranch) {
