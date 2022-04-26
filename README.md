@@ -10,13 +10,26 @@ sees it. This Action is an experiment in improving that through automation.
 ## Usage
 
 ```yaml
-- uses: freckle/halt-action@v1
-  with: # all optional, defaults shown
-    default-branch: main
-    halt-file: .github/HALT
-    status-context: halt
-    status-target-url: null
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+name: Halt
+
+on:
+  pull_request:
+  push:
+    branch: main
+
+jobs:
+  halt:
+    runs-on: ubuntu-latest
+    steps: - if: ${{ github.event_type == 'push' }}
+        uses: actions/checkout@v3         # needed for knowing changes in push
+
+      - uses: freckle/halt-action@v1
+        with:                             # all optional, defaults shown
+          default-branch: main
+          halt-file: .github/HALT
+          status-context: halt
+          status-target-url: null
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## How it works
