@@ -82,7 +82,7 @@ async function handlePullRequest(
   const haltFileContents =
     haltFile && "content" in haltFile ? atob(haltFile.content) : null;
 
-  if (!haltFileContents) {
+  if (haltFileContents === null) {
     core.info("Repository not halted");
     return await unhaltPullRequest(client, github.context, inputs, pullRequest);
   }
