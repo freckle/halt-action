@@ -561,7 +561,7 @@ function handlePullRequest(inputs, client, pullRequest) {
                 case 1:
                     haltFile = _a.sent();
                     haltFileContents = haltFile && "content" in haltFile ? atob(haltFile.content) : null;
-                    if (!!haltFileContents) return [3, 3];
+                    if (!(haltFileContents === null)) return [3, 3];
                     core.info("Repository not halted");
                     return [4, unhaltPullRequest(client, github.context, inputs, pullRequest)];
                 case 2: return [2, _a.sent()];
