@@ -18,7 +18,7 @@ on:
     branches: main
 
 jobs:
-  halt:
+  check-halt-status:
     runs-on: ubuntu-latest
     steps:
       - if: ${{ github.event_name == 'push' }}
