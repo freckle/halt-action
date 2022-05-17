@@ -15,7 +15,7 @@ name: Halt
 on:
   pull_request:
   push:
-    branch: main
+    branches: main
 
 jobs:
   halt:
