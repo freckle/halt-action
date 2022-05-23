@@ -476,7 +476,7 @@ var githubApi = __importStar(__nccwpck_require__(2565));
 var inputs_1 = __nccwpck_require__(6180);
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var inputs, client, pullRequest, error_1;
+        var inputs, client, pullRequest, payload, details, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -490,7 +490,7 @@ function run() {
                     core.info("githubToken: ".concat(inputs.githubToken));
                     core.endGroup();
                     client = githubApi.getClient(inputs.githubToken);
-                    if (!(github.context.ref === inputs.defaultBranch)) return [3, 2];
+                    if (!(github.context.ref === "refs/heads/".concat(inputs.defaultBranch))) return [3, 2];
                     return [4, handleMain(inputs, client)];
                 case 1: return [2, _a.sent()];
                 case 2:
@@ -499,7 +499,13 @@ function run() {
                     return [4, handlePullRequest(inputs, client, pullRequest)];
                 case 3: return [2, _a.sent()];
                 case 4:
-                    core.info("Ignoring non-default-branch, non-PullRequest Event");
+                    payload = Object.keys(github.context.payload);
+                    details = [
+                        "event: ".concat(github.context.eventName),
+                        "ref: ".concat(github.context.ref),
+                        "payload: [".concat(payload.join(", "), "]"),
+                    ];
+                    core.info("Ignoring:\n  ".concat(details.join("\n  ")));
                     return [3, 6];
                 case 5:
                     error_1 = _a.sent();
