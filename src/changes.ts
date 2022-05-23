@@ -25,7 +25,12 @@ export async function getChangesInPush(): Promise<Changes> {
   const spec = base ? `${base}..HEAD` : "HEAD^..HEAD";
 
   core.info(`Using changed files in ${spec}`);
-  const { stdout } = await exec("git", ["--name-status", "--oneline", spec]);
+  const { stdout } = await exec("git", [
+    "diff",
+    "--name-status",
+    "--oneline",
+    spec,
+  ]);
 
   return parseGitLog(stdout);
 }
