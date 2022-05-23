@@ -24,7 +24,7 @@ async function run() {
 
     const client = githubApi.getClient(inputs.githubToken);
 
-    if (github.context.ref === inputs.defaultBranch) {
+    if (github.context.ref === `refs/heads/${inputs.defaultBranch}`) {
       return await handleMain(inputs, client);
     }
 
