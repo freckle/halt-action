@@ -81,25 +81,32 @@ var core = __importStar(__nccwpck_require__(2186));
 var github = __importStar(__nccwpck_require__(5438));
 var exec_1 = __importDefault(__nccwpck_require__(7757));
 var githubApi = __importStar(__nccwpck_require__(2565));
+var emptyChanges = { additions: [], removals: [] };
 function getChangesInPush(branch) {
     return __awaiter(this, void 0, void 0, function () {
-        var base, spec, depth, stdout;
+        var base, spec, depth, maxAttempts, stdout, attempts;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     base = github.context.payload.before;
                     if (!base) {
                         core.warning("Unable to determine commit before push");
-                        return [2, { additions: [], removals: [] }];
+                        return [2, emptyChanges];
                     }
                     spec = "".concat(base, "..HEAD");
                     core.info("Using changed files in ".concat(spec));
-                    depth = 1;
+                    depth = 10;
+                    maxAttempts = 100;
                     stdout = null;
+                    attempts = 0;
                     _a.label = 1;
                 case 1: return [4, gitDiff(spec)];
                 case 2:
                     if (!!(stdout = _a.sent())) return [3, 4];
+                    if (attempts > maxAttempts) {
+                        core.warning("Not found at 1,000 commits, giving up");
+                        return [2, emptyChanges];
+                    }
                     core.info("Commit ".concat(base, " not found, fetching ").concat(depth, " more along ").concat(branch));
                     return [4, (0, exec_1.default)("git", ["fetch", "--deepen=".concat(depth), "origin", branch])];
                 case 3:
