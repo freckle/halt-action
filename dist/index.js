@@ -101,13 +101,7 @@ function getChangesInPush(branch) {
                 case 2:
                     if (!!(stdout = _a.sent())) return [3, 4];
                     core.info("Commit ".concat(base, " not found, fetching ").concat(depth, " more along ").concat(branch));
-                    return [4, (0, exec_1.default)("git", [
-                            "fetch",
-                            "--deepen=".concat(depth),
-                            "origin",
-                            branch,
-                            "FETCH_HEAD",
-                        ])];
+                    return [4, (0, exec_1.default)("git", ["fetch", "--deepen=".concat(depth), "origin", branch])];
                 case 3:
                     _a.sent();
                     return [3, 1];
