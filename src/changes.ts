@@ -19,21 +19,31 @@ export type Changes = {
   removals: string[];
 };
 
+const emptyChanges: Changes = { additions: [], removals: [] };
+
 export async function getChangesInPush(branch: string): Promise<Changes> {
   const base = github.context.payload.before;
 
   if (!base) {
     core.warning("Unable to determine commit before push");
-    return { additions: [], removals: [] };
+    return emptyChanges;
   }
 
   const spec = `${base}..HEAD`;
   core.info(`Using changed files in ${spec}`);
 
-  let depth = 1;
+  const depth = 10;
+  const maxAttempts = 100; // if you do a 1,000 commit push I'm sorry
+
   let stdout = null;
+  let attempts = 0;
 
   while (!(stdout = await gitDiff(spec))) {
+    if (attempts > maxAttempts) {
+      core.warning("Not found at 1,000 commits, giving up");
+      return emptyChanges;
+    }
+
     core.info(
       `Commit ${base} not found, fetching ${depth} more along ${branch}`
     );
