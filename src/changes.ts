@@ -19,20 +19,43 @@ export type Changes = {
   removals: string[];
 };
 
-export async function getChangesInPush(): Promise<Changes> {
-  // If we can't work out base we'll just use the most recent commit
+export async function getChangesInPush(branch: string): Promise<Changes> {
   const base = github.context.payload.before;
-  const spec = base ? `${base}..HEAD` : "HEAD^..HEAD";
 
+  if (!base) {
+    core.warning("Unable to determine commit before push");
+    return { additions: [], removals: [] };
+  }
+
+  const spec = `${base}..HEAD`;
   core.info(`Using changed files in ${spec}`);
-  const { stdout } = await exec("git", [
-    "diff",
-    "--name-status",
-    "--oneline",
-    spec,
-  ]);
+
+  let depth = 1;
+  let stdout = null;
+
+  while (!(stdout = await gitDiff(spec))) {
+    core.info(
+      `Commit ${base} not found, fetching ${depth} more along ${branch}`
+    );
+    await exec("git", ["fetch", `--deepen=${depth}`, "origin", branch]);
+  }
 
   return parseGitLog(stdout);
+}
+
+async function gitDiff(spec: string): Promise<string | null> {
+  try {
+    const { stdout } = await exec("git", [
+      "diff",
+      "--name-status",
+      "--oneline",
+      spec,
+    ]);
+
+    return stdout;
+  } catch {
+    return null;
+  }
 }
 
 // exported for testing
