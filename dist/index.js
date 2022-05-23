@@ -94,7 +94,7 @@ function getChangesInPush(branch) {
                     }
                     spec = "".concat(base, "..HEAD");
                     core.info("Using changed files in ".concat(spec));
-                    depth = 10;
+                    depth = 1;
                     stdout = null;
                     _a.label = 1;
                 case 1: return [4, gitDiff(spec)];
