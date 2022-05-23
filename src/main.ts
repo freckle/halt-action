@@ -34,7 +34,13 @@ async function run() {
       return await handlePullRequest(inputs, client, pullRequest);
     }
 
-    core.info("Ignoring non-default-branch, non-PullRequest Event");
+    const payload = Object.keys(github.context.payload);
+    const details = [
+      `event: ${github.context.eventName}`,
+      `ref: ${github.context.ref}`,
+      `payload: [${payload.join(", ")}]`,
+    ];
+    core.info(`Ignoring:\n  ${details.join("\n  ")}`);
   } catch (error) {
     if (error instanceof Error) {
       core.error(error);
