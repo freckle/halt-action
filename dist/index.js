@@ -81,15 +81,49 @@ var core = __importStar(__nccwpck_require__(2186));
 var github = __importStar(__nccwpck_require__(5438));
 var exec_1 = __importDefault(__nccwpck_require__(7757));
 var githubApi = __importStar(__nccwpck_require__(2565));
-function getChangesInPush() {
+function getChangesInPush(branch) {
     return __awaiter(this, void 0, void 0, function () {
-        var base, spec, stdout;
+        var base, spec, depth, stdout;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     base = github.context.payload.before;
-                    spec = base ? "".concat(base, "..HEAD") : "HEAD^..HEAD";
+                    if (!base) {
+                        core.warning("Unable to determine commit before push");
+                        return [2, { additions: [], removals: [] }];
+                    }
+                    spec = "".concat(base, "..HEAD");
                     core.info("Using changed files in ".concat(spec));
+                    depth = 10;
+                    stdout = null;
+                    _a.label = 1;
+                case 1: return [4, gitDiff(spec)];
+                case 2:
+                    if (!!(stdout = _a.sent())) return [3, 4];
+                    core.info("Commit ".concat(base, " not found, fetching ").concat(depth, " more along ").concat(branch));
+                    return [4, (0, exec_1.default)("git", [
+                            "fetch",
+                            "--deepen=".concat(depth),
+                            "origin",
+                            branch,
+                            "FETCH_HEAD",
+                        ])];
+                case 3:
+                    _a.sent();
+                    return [3, 1];
+                case 4: return [2, parseGitLog(stdout)];
+            }
+        });
+    });
+}
+exports.getChangesInPush = getChangesInPush;
+function gitDiff(spec) {
+    return __awaiter(this, void 0, void 0, function () {
+        var stdout, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 2, , 3]);
                     return [4, (0, exec_1.default)("git", [
                             "diff",
                             "--name-status",
@@ -97,13 +131,16 @@ function getChangesInPush() {
                             spec,
                         ])];
                 case 1:
-                    stdout = (_a.sent()).stdout;
-                    return [2, parseGitLog(stdout)];
+                    stdout = (_b.sent()).stdout;
+                    return [2, stdout];
+                case 2:
+                    _a = _b.sent();
+                    return [2, null];
+                case 3: return [2];
             }
         });
     });
 }
-exports.getChangesInPush = getChangesInPush;
 function parseGitLog(stdout) {
     var regexp = /^(?<mode>A|D)\s*(?<path>.*)$/;
     var additions = [];
@@ -537,7 +574,7 @@ function handleMain(inputs, client) {
         var changes, message;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4, (0, changes_1.getChangesInPush)()];
+                case 0: return [4, (0, changes_1.getChangesInPush)(inputs.defaultBranch)];
                 case 1:
                     changes = _a.sent();
                     if (!changes.additions.includes(inputs.haltFile)) return [3, 3];
