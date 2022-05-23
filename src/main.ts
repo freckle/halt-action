@@ -56,7 +56,7 @@ async function run() {
 }
 
 async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
-  const changes = await getChangesInPush();
+  const changes = await getChangesInPush(inputs.defaultBranch);
 
   if (changes.additions.includes(inputs.haltFile)) {
     core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} added`);
