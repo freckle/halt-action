@@ -90,7 +90,12 @@ function getChangesInPush() {
                     base = github.context.payload.before;
                     spec = base ? "".concat(base, "..HEAD") : "HEAD^..HEAD";
                     core.info("Using changed files in ".concat(spec));
-                    return [4, (0, exec_1.default)("git", ["--name-status", "--oneline", spec])];
+                    return [4, (0, exec_1.default)("git", [
+                            "diff",
+                            "--name-status",
+                            "--oneline",
+                            spec,
+                        ])];
                 case 1:
                     stdout = (_a.sent()).stdout;
                     return [2, parseGitLog(stdout)];
