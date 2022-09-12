@@ -553,7 +553,7 @@ function run() {
                 case 5:
                     error_1 = _a.sent();
                     if (error_1 instanceof Error) {
-                        core.error(error_1);
+                        core.error("".concat(error_1.name, ": ").concat(error_1.message, "\n").concat(error_1.stack));
                         core.setFailed(error_1.message);
                     }
                     else if (typeof error_1 === "string") {
@@ -609,7 +609,7 @@ function handlePullRequest(inputs, client, pullRequest) {
                 case 0: return [4, githubApi.getRepositoryContent(client, __assign(__assign({}, github.context.repo), { path: inputs.haltFile, ref: inputs.defaultBranch }))];
                 case 1:
                     haltFile = _a.sent();
-                    haltFileContents = haltFile && "content" in haltFile ? atob(haltFile.content) : null;
+                    haltFileContents = haltFile && "content" in haltFile ? decodeBase64(haltFile.content) : null;
                     if (!(haltFileContents === null)) return [3, 3];
                     core.info("Repository not halted");
                     return [4, unhaltPullRequest(client, github.context, inputs, pullRequest)];
@@ -630,6 +630,10 @@ function handlePullRequest(inputs, client, pullRequest) {
             }
         });
     });
+}
+function decodeBase64(input) {
+    var buff = Buffer.from(input, "base64");
+    return buff.toString("utf-8");
 }
 function haltOpenPullRequests(client, context, inputs, message) {
     return __awaiter(this, void 0, void 0, function () {
