@@ -43,7 +43,7 @@ async function run() {
     core.info(`Ignoring:\n  ${details.join("\n  ")}`);
   } catch (error) {
     if (error instanceof Error) {
-      core.error(error);
+      core.error(`${error.name}: ${error.message}\n${error.stack}`);
       core.setFailed(error.message);
     } else if (typeof error === "string") {
       core.error(error);
@@ -86,7 +86,7 @@ async function handlePullRequest(
   });
 
   const haltFileContents =
-    haltFile && "content" in haltFile ? atob(haltFile.content) : null;
+    haltFile && "content" in haltFile ? decodeBase64(haltFile.content) : null;
 
   if (haltFileContents === null) {
     core.info("Repository not halted");
@@ -112,6 +112,11 @@ async function handlePullRequest(
     pullRequest,
     haltMessage(haltFileContents)
   );
+}
+
+function decodeBase64(input: string): string {
+  const buff = Buffer.from(input, "base64");
+  return buff.toString("utf-8");
 }
 
 async function haltOpenPullRequests(
