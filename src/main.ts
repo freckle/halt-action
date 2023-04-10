@@ -79,10 +79,11 @@ async function handlePullRequest(
   client: GitHubClient,
   pullRequest: PullRequest
 ): Promise<void> {
+  const haltBranch = inputs.haltBranch || inputs.defaultBranch;
   const haltFile = await githubApi.getRepositoryContent(client, {
     ...github.context.repo,
     path: inputs.haltFile,
-    ref: inputs.defaultBranch,
+    ref: haltBranch,
   });
 
   const haltFileContents =
@@ -100,11 +101,11 @@ async function handlePullRequest(
   );
 
   if (changes.removals.includes(inputs.haltFile)) {
-    core.info(`${inputs.defaultBranch}:${inputs.haltFile} exists, but removed`);
+    core.info(`${haltBranch}:${inputs.haltFile} exists, but removed`);
     return await unhaltPullRequest(client, github.context, inputs, pullRequest);
   }
 
-  core.info(`${inputs.defaultBranch}:${inputs.haltFile} exists`);
+  core.info(`${haltBranch}:${inputs.haltFile} exists`);
   await haltPullRequest(
     client,
     github.context,
