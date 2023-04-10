@@ -37,8 +37,8 @@ jobs:
 
 **When you need to halt the line**:
 
-Commit a file to `main` at `.github/HALT`. The file can be blank, or contain a
-short message about why -- which will become the status description.
+Commit a file to `main` at `.github/HALT`. The file can be blank, or contain
+contents about why. The format for these contents is discussed later.
 
 This Action will see this addition and flip all open PRs to red. When the action
 runs on any PRs after that, as long as this file exists on `main`, those PRs
@@ -53,6 +53,15 @@ Remove the file from `main`. This Action will see this removal and flip all open
 PRs to green. Typically, we'd do this in the same PR that fixes the issue (if it
 was caused by our code), so that things naturally begin moving again when the
 fix hits `main`.
+
+## Halt File Contents
+
+When a "halt file" exists, PRs will be halted. If the file is blank, a default
+status description is used. However, if the file _does_ have content, the first
+line will become the PR status description. The remaining lines, if there are
+any, will be added as a [Workflow Job Summary][workflow-job-summary].
+
+[workflow-job-summary]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
 
 ## Inputs & Outputs
 
