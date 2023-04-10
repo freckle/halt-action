@@ -10,6 +10,8 @@ import * as githubApi from "./github-api";
 import type { Inputs } from "./inputs";
 import { getInputs } from "./inputs";
 import type { PullRequest } from "./pull-request";
+import type { Message } from "./message";
+import * as message from "./message";
 
 async function run() {
   try {
@@ -60,9 +62,11 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
 
   if (changes.additions.includes(inputs.haltFile)) {
     core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} added`);
-    const message = haltMessage(fs.readFileSync(inputs.haltFile).toString());
-    core.info(`Halting all open PRs: ${message}`);
-    await haltOpenPullRequests(client, github.context, inputs, message);
+    const msg = message.fromContent(
+      fs.readFileSync(inputs.haltFile).toString()
+    );
+    core.info(`Halting all open PRs: ${msg.title}`);
+    await haltOpenPullRequests(client, github.context, inputs, msg);
     core.endGroup();
   }
 
@@ -111,7 +115,7 @@ async function handlePullRequest(
     github.context,
     inputs,
     pullRequest,
-    haltMessage(haltFileContents)
+    message.fromContent(haltFileContents)
   );
 }
 
@@ -124,7 +128,7 @@ async function haltOpenPullRequests(
   client: GitHubClient,
   context: Context,
   inputs: Inputs,
-  message: string
+  message: Message
 ): Promise<void> {
   const pullRequests = await githubApi.listRepositoryPullRequests(client, {
     ...context.repo,
@@ -156,16 +160,14 @@ async function haltPullRequest(
   context: Context,
   inputs: Inputs,
   pullRequest: PullRequest,
-  message: string
+  message: Message
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
 
-  const summary = core.summary
-    .addHeading("Pull Request halted")
-    .addRaw(message);
+  const summary = core.summary.addHeading(message.title);
 
-  if (inputs.statusTargetUrl) {
-    summary.addLink("More details", inputs.statusTargetUrl);
+  if (message.summary) {
+    summary.addRaw(message.summary);
   }
 
   await summary.write();
@@ -175,7 +177,7 @@ async function haltPullRequest(
     sha: pullRequest.head.sha,
     context: inputs.statusContext,
     state: "failure",
-    description: message,
+    description: message.title,
     target_url: inputs.statusTargetUrl,
   });
 }
@@ -195,10 +197,6 @@ async function unhaltPullRequest(
     description: "Merge away",
     target_url: inputs.statusTargetUrl,
   });
-}
-
-function haltMessage(contents: string): string {
-  return contents.trim() === "" ? "Merges halted" : contents.trim();
 }
 
 run();
