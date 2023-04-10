@@ -4,9 +4,12 @@ description: |
 author: "Freckle"
 inputs:
   default-branch:
-    description: "The branch on the halt file can be found"
-    require: true
+    description: "The default branch for the repository"
+    required: true
     default: "main"
+  halt-branch:
+    description: "The branch where the halt file may be found, if not the default-branch"
+    required: false
   halt-file:
     description: "The path to the file used to halt"
     require: true
