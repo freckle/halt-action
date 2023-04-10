@@ -158,6 +158,17 @@ async function haltPullRequest(
   message: string
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
+
+  const summary = core.summary
+    .addHeading("Pull Request halted")
+    .addRaw(message);
+
+  if (inputs.statusTargetUrl) {
+    summary.addLink("More details", inputs.statusTargetUrl);
+  }
+
+  await summary.write();
+
   await githubApi.createCommitStatus(client, {
     ...context.repo,
     sha: pullRequest.head.sha,
