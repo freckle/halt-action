@@ -20,7 +20,8 @@ inputs:
     default: "halt"
   status-target-url:
     description: "An optional target-url for commit-statuses"
-    required: false
+    required: true
+    default: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
   github-token:
     description: "Override GitHub token, if necessary"
     required: true
