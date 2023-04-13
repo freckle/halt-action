@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
-import type { Changes } from "./changes";
 import { getChangesInPush, getChangesInPullRequest } from "./changes";
 import type { Context } from "./context";
 import type { GitHubClient } from "./github-api";
