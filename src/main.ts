@@ -66,6 +66,7 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
     );
     core.info(`Halting all open PRs: ${msg.title}`);
     await haltOpenPullRequests(client, github.context, inputs, msg);
+    await addWorkflowSummary(msg);
     core.endGroup();
   }
 
@@ -109,13 +110,9 @@ async function handlePullRequest(
   }
 
   core.info(`${haltBranch}:${inputs.haltFile} exists`);
-  await haltPullRequest(
-    client,
-    github.context,
-    inputs,
-    pullRequest,
-    message.fromContent(haltFileContents)
-  );
+  const msg = message.fromContent(haltFileContents);
+  await haltPullRequest(client, github.context, inputs, pullRequest, msg);
+  await addWorkflowSummary(msg);
 }
 
 function decodeBase64(input: string): string {
@@ -162,15 +159,6 @@ async function haltPullRequest(
   message: Message
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
-
-  const summary = core.summary.addHeading(message.title);
-
-  if (message.summary) {
-    summary.addRaw(message.summary);
-  }
-
-  await summary.write();
-
   await githubApi.createCommitStatus(client, {
     ...context.repo,
     sha: pullRequest.head.sha,
@@ -196,6 +184,16 @@ async function unhaltPullRequest(
     description: "Merge away",
     target_url: inputs.statusTargetUrl,
   });
+}
+
+async function addWorkflowSummary(msg: Message): Promise<void> {
+  const summary = core.summary.addHeading(msg.title);
+
+  if (msg.summary) {
+    summary.addRaw(msg.summary);
+  }
+
+  await summary.write();
 }
 
 run();
