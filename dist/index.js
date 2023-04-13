@@ -580,32 +580,35 @@ function handleMain(inputs, client) {
                 case 0: return [4, (0, changes_1.getChangesInPush)(inputs.defaultBranch)];
                 case 1:
                     changes = _a.sent();
-                    if (!changes.additions.includes(inputs.haltFile)) return [3, 3];
+                    if (!changes.additions.includes(inputs.haltFile)) return [3, 4];
                     core.startGroup("".concat(inputs.defaultBranch, ":").concat(inputs.haltFile, " added"));
                     msg = message.fromContent(fs.readFileSync(inputs.haltFile).toString());
                     core.info("Halting all open PRs: ".concat(msg.title));
                     return [4, haltOpenPullRequests(client, github.context, inputs, msg)];
                 case 2:
                     _a.sent();
-                    core.endGroup();
-                    _a.label = 3;
+                    return [4, addWorkflowSummary(msg)];
                 case 3:
-                    if (!changes.removals.includes(inputs.haltFile)) return [3, 5];
+                    _a.sent();
+                    core.endGroup();
+                    _a.label = 4;
+                case 4:
+                    if (!changes.removals.includes(inputs.haltFile)) return [3, 6];
                     core.startGroup("".concat(inputs.defaultBranch, ":").concat(inputs.haltFile, " removed"));
                     core.info("Un-halting all open PRs");
                     return [4, unhaltOpenPullRequests(client, github.context, inputs)];
-                case 4:
+                case 5:
                     _a.sent();
                     core.endGroup();
-                    _a.label = 5;
-                case 5: return [2];
+                    _a.label = 6;
+                case 6: return [2];
             }
         });
     });
 }
 function handlePullRequest(inputs, client, pullRequest) {
     return __awaiter(this, void 0, void 0, function () {
-        var haltBranch, haltFile, haltFileContents, changes;
+        var haltBranch, haltFile, haltFileContents, changes, msg;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -627,8 +630,12 @@ function handlePullRequest(inputs, client, pullRequest) {
                 case 5: return [2, _a.sent()];
                 case 6:
                     core.info("".concat(haltBranch, ":").concat(inputs.haltFile, " exists"));
-                    return [4, haltPullRequest(client, github.context, inputs, pullRequest, message.fromContent(haltFileContents))];
+                    msg = message.fromContent(haltFileContents);
+                    return [4, haltPullRequest(client, github.context, inputs, pullRequest, msg)];
                 case 7:
+                    _a.sent();
+                    return [4, addWorkflowSummary(msg)];
+                case 8:
                     _a.sent();
                     return [2];
             }
@@ -693,20 +700,12 @@ function unhaltOpenPullRequests(client, context, inputs) {
 }
 function haltPullRequest(client, context, inputs, pullRequest, message) {
     return __awaiter(this, void 0, void 0, function () {
-        var summary;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     console.info("Setting halted status for PR #".concat(pullRequest.number));
-                    summary = core.summary.addHeading(message.title);
-                    if (message.summary) {
-                        summary.addRaw(message.summary);
-                    }
-                    return [4, summary.write()];
-                case 1:
-                    _a.sent();
                     return [4, githubApi.createCommitStatus(client, __assign(__assign({}, context.repo), { sha: pullRequest.head.sha, context: inputs.statusContext, state: "failure", description: message.title, target_url: inputs.statusTargetUrl }))];
-                case 2:
+                case 1:
                     _a.sent();
                     return [2];
             }
@@ -720,6 +719,24 @@ function unhaltPullRequest(client, context, inputs, pullRequest) {
                 case 0:
                     console.info("Setting un-halted status for PR #".concat(pullRequest.number));
                     return [4, githubApi.createCommitStatus(client, __assign(__assign({}, context.repo), { sha: pullRequest.head.sha, context: inputs.statusContext, state: "success", description: "Merge away", target_url: inputs.statusTargetUrl }))];
+                case 1:
+                    _a.sent();
+                    return [2];
+            }
+        });
+    });
+}
+function addWorkflowSummary(msg) {
+    return __awaiter(this, void 0, void 0, function () {
+        var summary;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    summary = core.summary.addHeading(msg.title);
+                    if (msg.summary) {
+                        summary.addRaw(msg.summary);
+                    }
+                    return [4, summary.write()];
                 case 1:
                     _a.sent();
                     return [2];
