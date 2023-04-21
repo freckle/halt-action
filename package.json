@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@actions/glob": "^0.2.0",
-    "@octokit/plugin-rest-endpoint-methods": "^5.13.0",
+    "@octokit/plugin-rest-endpoint-methods": "^7.0.1",
     "@octokit/types": "^6.34.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.14",
