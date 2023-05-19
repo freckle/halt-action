@@ -1,14 +1,13 @@
 name: Mergeabot
 
 on:
+  pull_request:
   schedule:
     - cron: "0 0 * * *"
 
-  # test changes to this file itself
-  pull_request:
-    paths:
-      - .github/workflows/mergeabot.yml
-
+permissions:
+  pull-request: write
+  
 jobs:
   mergeabot:
     runs-on: ubuntu-latest
