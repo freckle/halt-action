@@ -22,6 +22,12 @@ inputs:
     description: "An optional target-url for commit-statuses"
     required: true
     default: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  slack-webhook:
+    description: "Webhook URL to send Slack notifications"
+    required: false
+  slack-channels:
+    description: "Newline-separated channels to send Slack notifications to, if not the webhook default"
+    required: false
   github-token:
     description: "Override GitHub token, if necessary"
     required: true
