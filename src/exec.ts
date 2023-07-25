@@ -11,7 +11,7 @@ import { exec as execImpl, ExecOptions } from "@actions/exec";
 export default async function exec(
   commandLine: string,
   args?: string[],
-  options?: ExecOptions,
+  options?: ExecOptions
 ): Promise<ExecResult> {
   options = options || {};
   let stdout = "";

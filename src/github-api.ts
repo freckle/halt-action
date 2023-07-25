@@ -17,7 +17,7 @@ type CreateCommitStatusResponse =
 
 export async function createCommitStatus(
   client: GitHubClient,
-  options: CreateCommitStatusParameters,
+  options: CreateCommitStatusParameters
 ): Promise<CreateCommitStatusResponse["data"]> {
   const response = await client.rest.repos.createCommitStatus(options);
   return response.data;
@@ -31,7 +31,7 @@ type ListRepositoryPullRequestsResponse =
 
 export async function listRepositoryPullRequests(
   client: GitHubClient,
-  options: ListRepositoryPullRequestsParameters,
+  options: ListRepositoryPullRequestsParameters
 ): Promise<ListRepositoryPullRequestsResponse["data"]> {
   return await client.paginate(client.rest.pulls.list, options);
 }
@@ -44,7 +44,7 @@ type GetPullRequestFilesResponse =
 
 export async function getPullRequestFiles(
   client: GitHubClient,
-  options: GetPullRequestFilesParameters,
+  options: GetPullRequestFilesParameters
 ): Promise<GetPullRequestFilesResponse["data"]> {
   return await client.paginate(client.rest.pulls.listFiles, options);
 }
@@ -57,7 +57,7 @@ type GetRepositoryContentResponse =
 
 export async function getRepositoryContent(
   client: GitHubClient,
-  options: GetRepositoryContentParameters,
+  options: GetRepositoryContentParameters
 ): Promise<GetRepositoryContentResponse["data"] | null> {
   try {
     const response = await client.rest.repos.getContent(options);
