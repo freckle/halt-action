@@ -30,3 +30,9 @@ export function fromContent(contents: string): Message {
       };
   }
 }
+
+export function toString(message: Message): string {
+  return message.summary
+    ? `${message.title}\n${message.summary}`
+    : message.title;
+}

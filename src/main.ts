@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
+import type { IncomingWebhookSendArguments } from "@slack/webhook";
+import { IncomingWebhook } from "@slack/webhook";
 import { getChangesInPush, getChangesInPullRequest } from "./changes";
 import type { Context } from "./context";
 import type { GitHubClient } from "./github-api";
@@ -62,11 +64,17 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
   if (changes.additions.includes(inputs.haltFile)) {
     core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} added`);
     const msg = message.fromContent(
-      fs.readFileSync(inputs.haltFile).toString()
+      fs.readFileSync(inputs.haltFile).toString(),
     );
     core.info(`Halting all open PRs: ${msg.title}`);
     await haltOpenPullRequests(client, github.context, inputs, msg);
     await addWorkflowSummary(msg);
+    await sendSlackNotifications(
+      inputs,
+      "failure",
+      `CI/CD on ${github.context.repo} has been halted`,
+      msg,
+    );
     core.endGroup();
   }
 
@@ -74,6 +82,11 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
     core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} removed`);
     core.info("Un-halting all open PRs");
     await unhaltOpenPullRequests(client, github.context, inputs);
+    await sendSlackNotifications(
+      inputs,
+      "success",
+      `CI/CD on ${github.context.repo} is no longer halted`,
+    );
     core.endGroup();
   }
 }
@@ -81,7 +94,7 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
 async function handlePullRequest(
   inputs: Inputs,
   client: GitHubClient,
-  pullRequest: PullRequest
+  pullRequest: PullRequest,
 ): Promise<void> {
   const haltBranch = inputs.haltBranch || inputs.defaultBranch;
   const haltFile = await githubApi.getRepositoryContent(client, {
@@ -101,7 +114,7 @@ async function handlePullRequest(
   const changes = await getChangesInPullRequest(
     client,
     github.context,
-    pullRequest
+    pullRequest,
   );
 
   if (changes.removals.includes(inputs.haltFile)) {
@@ -124,7 +137,7 @@ async function haltOpenPullRequests(
   client: GitHubClient,
   context: Context,
   inputs: Inputs,
-  message: Message
+  message: Message,
 ): Promise<void> {
   const pullRequests = await githubApi.listRepositoryPullRequests(client, {
     ...context.repo,
@@ -139,7 +152,7 @@ async function haltOpenPullRequests(
 async function unhaltOpenPullRequests(
   client: GitHubClient,
   context: Context,
-  inputs: Inputs
+  inputs: Inputs,
 ): Promise<void> {
   const pullRequests = await githubApi.listRepositoryPullRequests(client, {
     ...context.repo,
@@ -156,7 +169,7 @@ async function haltPullRequest(
   context: Context,
   inputs: Inputs,
   pullRequest: PullRequest,
-  message: Message
+  message: Message,
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
@@ -173,7 +186,7 @@ async function unhaltPullRequest(
   client: GitHubClient,
   context: Context,
   inputs: Inputs,
-  pullRequest: PullRequest
+  pullRequest: PullRequest,
 ): Promise<void> {
   console.info(`Setting un-halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
@@ -194,6 +207,46 @@ async function addWorkflowSummary(msg: Message): Promise<void> {
   }
 
   await summary.write();
+}
+
+async function sendSlackNotifications(
+  inputs: Inputs,
+  color: string,
+  title: string,
+  msg?: Message,
+): Promise<void> {
+  if (!inputs.slackWebhook) {
+    core.debug("Skipping Slack notification (no webhook)");
+    return;
+  }
+
+  const slack = new IncomingWebhook(inputs.slackWebhook);
+  const webhook: IncomingWebhookSendArguments = {
+    attachments: [
+      {
+        fallback: title,
+        color: color,
+        fields: [
+          {
+            title: title,
+            value: msg ? message.toString(msg) : "",
+            short: false,
+          },
+        ],
+      },
+    ],
+  };
+
+  const promises = inputs.slackChannels
+    ? inputs.slackChannels.map((channel) => {
+        webhook.channel = channel;
+        return slack.send(webhook);
+      })
+    : [slack.send(webhook)];
+
+  core.debug(`Sending ${promises.length} Slack notification(s)`);
+  const results = Promise.all(promises);
+  core.debug(`Response(s): ${results}`);
 }
 
 run();
