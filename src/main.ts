@@ -64,7 +64,7 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
   if (changes.additions.includes(inputs.haltFile)) {
     core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} added`);
     const msg = message.fromContent(
-      fs.readFileSync(inputs.haltFile).toString()
+      fs.readFileSync(inputs.haltFile).toString(),
     );
     core.info(`Halting all open PRs: ${msg.title}`);
     await haltOpenPullRequests(client, github.context, inputs, msg);
@@ -85,7 +85,7 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
 async function handlePullRequest(
   inputs: Inputs,
   client: GitHubClient,
-  pullRequest: PullRequest
+  pullRequest: PullRequest,
 ): Promise<void> {
   const haltBranch = inputs.haltBranch || inputs.defaultBranch;
   const haltFile = await githubApi.getRepositoryContent(client, {
@@ -105,7 +105,7 @@ async function handlePullRequest(
   const changes = await getChangesInPullRequest(
     client,
     github.context,
-    pullRequest
+    pullRequest,
   );
 
   if (changes.removals.includes(inputs.haltFile)) {
@@ -128,7 +128,7 @@ async function haltOpenPullRequests(
   client: GitHubClient,
   context: Context,
   inputs: Inputs,
-  message: Message
+  message: Message,
 ): Promise<void> {
   const pullRequests = await githubApi.listRepositoryPullRequests(client, {
     ...context.repo,
@@ -143,7 +143,7 @@ async function haltOpenPullRequests(
 async function unhaltOpenPullRequests(
   client: GitHubClient,
   context: Context,
-  inputs: Inputs
+  inputs: Inputs,
 ): Promise<void> {
   const pullRequests = await githubApi.listRepositoryPullRequests(client, {
     ...context.repo,
@@ -160,7 +160,7 @@ async function haltPullRequest(
   context: Context,
   inputs: Inputs,
   pullRequest: PullRequest,
-  message: Message
+  message: Message,
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
@@ -177,7 +177,7 @@ async function unhaltPullRequest(
   client: GitHubClient,
   context: Context,
   inputs: Inputs,
-  pullRequest: PullRequest
+  pullRequest: PullRequest,
 ): Promise<void> {
   console.info(`Setting un-halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
