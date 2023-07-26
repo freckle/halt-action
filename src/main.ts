@@ -214,7 +214,7 @@ async function sendSlackNotifications(
     ? {
         color: "failure",
         title: `CI/CD on ${github.context.repo} has been halted`,
-        value: message.toString(msg),
+        value: message.wasOriginallyEmpty(msg) ? "" : message.toString(msg),
       }
     : {
         color: "success",
