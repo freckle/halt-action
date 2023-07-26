@@ -783,7 +783,7 @@ function sendSlackNotifications(inputs, msg) {
                 ? {
                     color: "failure",
                     title: "CI/CD on ".concat(github.context.repo, " has been halted"),
-                    value: message.toString(msg),
+                    value: message.wasOriginallyEmpty(msg) ? "" : message.toString(msg),
                 }
                 : {
                     color: "success",
@@ -830,8 +830,12 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toString = exports.fromContent = void 0;
+exports.toString = exports.fromContent = exports.wasOriginallyEmpty = void 0;
 var DEFAULT_TITLE = "Merges halted";
+function wasOriginallyEmpty(message) {
+    return message.title === DEFAULT_TITLE;
+}
+exports.wasOriginallyEmpty = wasOriginallyEmpty;
 function fromContent(contents) {
     var lines = contents.trim() === "" ? [] : contents.split("\n");
     switch (lines.length) {
