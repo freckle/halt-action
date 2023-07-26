@@ -5,6 +5,10 @@ export type Message = {
   summary: string | null;
 };
 
+export function wasOriginallyEmpty(message: Message): boolean {
+  return message.title === DEFAULT_TITLE;
+}
+
 export function fromContent(contents: string): Message {
   const lines = contents.trim() === "" ? [] : contents.split("\n");
 
