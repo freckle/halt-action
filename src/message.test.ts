@@ -56,3 +56,15 @@ paragraph or two.
 - Others
 `);
 });
+
+test("toString", () => {
+  const msgSingle = "We're down";
+  const msgMulti = `We're down
+
+And this is why.
+`;
+
+  expect(message.toString(message.fromContent(""))).toEqual("Merges halted");
+  expect(message.toString(message.fromContent(msgSingle))).toEqual(msgSingle);
+  expect(message.toString(message.fromContent(msgMulti))).toEqual(msgMulti);
+});
