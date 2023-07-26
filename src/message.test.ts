@@ -1,20 +1,20 @@
 import * as message from "./message";
 
-test("fromContent empty", async () => {
+test("fromContent empty", () => {
   const msg = message.fromContent("");
 
   expect(msg.title).toEqual("Merges halted");
   expect(msg.summary).toBeNull();
 });
 
-test("fromContent single-line", async () => {
+test("fromContent single-line", () => {
   const msg = message.fromContent("We're down");
 
   expect(msg.title).toEqual("We're down");
   expect(msg.summary).toBeNull();
 });
 
-test("fromContent multi-line", async () => {
+test("fromContent multi-line", () => {
   const msg = message.fromContent(`This is the first line
 
 And these are some follow up lines that are really long and wrapping into a
@@ -36,7 +36,7 @@ paragraph or two.
 `);
 });
 
-test("fromContent multi-line squished", async () => {
+test("fromContent multi-line squished", () => {
   const msg = message.fromContent(`This is the first line
 And these are some follow up lines that are really long and wrapping into a
 paragraph or two.
