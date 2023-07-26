@@ -1,5 +1,16 @@
 import * as message from "./message";
 
+test("wasOriginallyEmpty", () => {
+  const wasOriginallyEmpty = (x: string): boolean => {
+    return message.wasOriginallyEmpty(message.fromContent(x));
+  };
+
+  expect(wasOriginallyEmpty("")).toEqual(true);
+  expect(wasOriginallyEmpty("  \n")).toEqual(true);
+  expect(wasOriginallyEmpty("We're down")).toEqual(false);
+  expect(wasOriginallyEmpty("We're down\n\nBecause")).toEqual(false);
+});
+
 test("fromContent empty", () => {
   const msg = message.fromContent("");
 
@@ -57,14 +68,14 @@ paragraph or two.
 `);
 });
 
-test("toString", () => {
-  const msgSingle = "We're down";
-  const msgMulti = `We're down
+test("toString preserves content", () => {
+  const single = "We're down";
+  const multi = `We're down
 
 And this is why.
 `;
 
   expect(message.toString(message.fromContent(""))).toEqual("Merges halted");
-  expect(message.toString(message.fromContent(msgSingle))).toEqual(msgSingle);
-  expect(message.toString(message.fromContent(msgMulti))).toEqual(msgMulti);
+  expect(message.toString(message.fromContent(single))).toEqual(single);
+  expect(message.toString(message.fromContent(multi))).toEqual(multi);
 });
