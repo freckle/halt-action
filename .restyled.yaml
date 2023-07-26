@@ -1,3 +1,4 @@
+restylers_version: dev # to get prettier v3
 restylers:
   - clang-format:
       enabled: false
