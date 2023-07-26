@@ -69,12 +69,7 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
     core.info(`Halting all open PRs: ${msg.title}`);
     await haltOpenPullRequests(client, github.context, inputs, msg);
     await addWorkflowSummary(msg);
-    await sendSlackNotifications(
-      inputs,
-      "failure",
-      `CI/CD on ${github.context.repo} has been halted`,
-      msg
-    );
+    await sendSlackNotifications(inputs, msg);
     core.endGroup();
   }
 
@@ -82,11 +77,7 @@ async function handleMain(inputs: Inputs, client: GitHubClient): Promise<void> {
     core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} removed`);
     core.info("Un-halting all open PRs");
     await unhaltOpenPullRequests(client, github.context, inputs);
-    await sendSlackNotifications(
-      inputs,
-      "success",
-      `CI/CD on ${github.context.repo} is no longer halted`
-    );
+    await sendSlackNotifications(inputs);
     core.endGroup();
   }
 }
@@ -211,25 +202,36 @@ async function addWorkflowSummary(msg: Message): Promise<void> {
 
 async function sendSlackNotifications(
   inputs: Inputs,
-  color: string,
-  title: string,
-  msg?: Message
+  msg?: Message,
 ): Promise<void> {
   if (!inputs.slackWebhook) {
     core.debug("Skipping Slack notification (no webhook)");
     return;
   }
 
+  // Use presence of msg to know if we're sending failure or success
+  const { color, title, value } = msg
+    ? {
+        color: "failure",
+        title: `CI/CD on ${github.context.repo} has been halted`,
+        value: message.toString(msg),
+      }
+    : {
+        color: "success",
+        title: `CI/CD on ${github.context.repo} is no longer halted`,
+        value: "",
+      };
+
   const slack = new IncomingWebhook(inputs.slackWebhook);
   const webhook: IncomingWebhookSendArguments = {
     attachments: [
       {
         fallback: title,
-        color: color,
+        color,
         fields: [
           {
-            title: title,
-            value: msg ? message.toString(msg) : "",
+            title,
+            value,
             short: false,
           },
         ],
