@@ -6,17 +6,6 @@
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -40,124 +29,64 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getChangesInPullRequest = exports.parseGitLog = exports.getChangesInPush = void 0;
-var core = __importStar(__nccwpck_require__(2186));
-var github = __importStar(__nccwpck_require__(5438));
-var exec_1 = __importDefault(__nccwpck_require__(7757));
-var githubApi = __importStar(__nccwpck_require__(2565));
-var emptyChanges = { additions: [], removals: [] };
-function getChangesInPush(branch) {
-    return __awaiter(this, void 0, void 0, function () {
-        var base, spec, depth, maxAttempts, stdout, attempts;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    base = github.context.payload.before;
-                    if (!base) {
-                        core.warning("Unable to determine commit before push");
-                        return [2, emptyChanges];
-                    }
-                    spec = "".concat(base, "..HEAD");
-                    core.info("Using changed files in ".concat(spec));
-                    depth = 10;
-                    maxAttempts = 100;
-                    stdout = null;
-                    attempts = 0;
-                    _a.label = 1;
-                case 1: return [4, gitDiff(spec)];
-                case 2:
-                    if (!!(stdout = _a.sent())) return [3, 4];
-                    if (attempts > maxAttempts) {
-                        core.warning("Not found at 1,000 commits, giving up");
-                        return [2, emptyChanges];
-                    }
-                    core.info("Commit ".concat(base, " not found, fetching ").concat(depth, " more along ").concat(branch));
-                    return [4, (0, exec_1.default)("git", ["fetch", "--deepen=".concat(depth), "origin", branch])];
-                case 3:
-                    _a.sent();
-                    return [3, 1];
-                case 4: return [2, parseGitLog(stdout)];
-            }
-        });
-    });
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const exec_1 = __importDefault(__nccwpck_require__(7757));
+const githubApi = __importStar(__nccwpck_require__(2565));
+const emptyChanges = { additions: [], removals: [] };
+async function getChangesInPush(branch) {
+    const base = github.context.payload.before;
+    if (!base) {
+        core.warning("Unable to determine commit before push");
+        return emptyChanges;
+    }
+    const spec = `${base}..HEAD`;
+    core.info(`Using changed files in ${spec}`);
+    const depth = 10;
+    const maxAttempts = 100;
+    let stdout = null;
+    let attempts = 0;
+    while (!(stdout = await gitDiff(spec))) {
+        if (attempts > maxAttempts) {
+            core.warning("Not found at 1,000 commits, giving up");
+            return emptyChanges;
+        }
+        core.info(`Commit ${base} not found, fetching ${depth} more along ${branch}`);
+        await (0, exec_1.default)("git", ["fetch", `--deepen=${depth}`, "origin", branch]);
+    }
+    return parseGitLog(stdout);
 }
 exports.getChangesInPush = getChangesInPush;
-function gitDiff(spec) {
-    return __awaiter(this, void 0, void 0, function () {
-        var stdout, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _b.trys.push([0, 2, , 3]);
-                    return [4, (0, exec_1.default)("git", [
-                            "diff",
-                            "--name-status",
-                            "--oneline",
-                            spec,
-                        ])];
-                case 1:
-                    stdout = (_b.sent()).stdout;
-                    return [2, stdout];
-                case 2:
-                    _a = _b.sent();
-                    return [2, null];
-                case 3: return [2];
-            }
-        });
-    });
+async function gitDiff(spec) {
+    try {
+        const { stdout } = await (0, exec_1.default)("git", [
+            "diff",
+            "--name-status",
+            "--oneline",
+            spec,
+        ]);
+        return stdout;
+    }
+    catch {
+        return null;
+    }
 }
 function parseGitLog(stdout) {
-    var regexp = /^(?<mode>A|D)\s*(?<path>.*)$/;
-    var additions = [];
-    var removals = [];
+    const regexp = /^(?<mode>A|D)\s*(?<path>.*)$/;
+    const additions = [];
+    const removals = [];
     stdout
         .trim()
         .split(/\r?\n/)
-        .forEach(function (ln) {
-        var _a, _b;
-        var m = regexp.exec(ln);
-        var mode = (_a = m === null || m === void 0 ? void 0 : m.groups) === null || _a === void 0 ? void 0 : _a.mode;
-        var path = (_b = m === null || m === void 0 ? void 0 : m.groups) === null || _b === void 0 ? void 0 : _b.path;
+        .forEach((ln) => {
+        const m = regexp.exec(ln);
+        const mode = m?.groups?.mode;
+        const path = m?.groups?.path;
         if (mode && path) {
             switch (mode) {
                 case "A":
@@ -173,33 +102,27 @@ function parseGitLog(stdout) {
             }
         }
     });
-    return { additions: additions, removals: removals };
+    return { additions, removals };
 }
 exports.parseGitLog = parseGitLog;
-function getChangesInPullRequest(client, context, pullRequest) {
-    return __awaiter(this, void 0, void 0, function () {
-        var changes, additions, removals;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, githubApi.getPullRequestFiles(client, __assign(__assign({}, context.repo), { pull_number: pullRequest.number }))];
-                case 1:
-                    changes = _a.sent();
-                    additions = [];
-                    removals = [];
-                    changes.forEach(function (change) {
-                        switch (change.status) {
-                            case "added":
-                                additions.push(change.filename);
-                                break;
-                            case "removed":
-                                removals.push(change.filename);
-                                break;
-                        }
-                    });
-                    return [2, { additions: additions, removals: removals }];
-            }
-        });
+async function getChangesInPullRequest(client, context, pullRequest) {
+    const changes = await githubApi.getPullRequestFiles(client, {
+        ...context.repo,
+        pull_number: pullRequest.number,
     });
+    const additions = [];
+    const removals = [];
+    changes.forEach((change) => {
+        switch (change.status) {
+            case "added":
+                additions.push(change.filename);
+                break;
+            case "removed":
+                removals.push(change.filename);
+                break;
+        }
+    });
+    return { additions, removals };
 }
 exports.getChangesInPullRequest = getChangesInPullRequest;
 
@@ -207,68 +130,22 @@ exports.getChangesInPullRequest = getChangesInPullRequest;
 /***/ }),
 
 /***/ 7757:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var exec_1 = __nccwpck_require__(1514);
-function exec(commandLine, args, options) {
-    return __awaiter(this, void 0, void 0, function () {
-        var stdout, stderr, code;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    options = options || {};
-                    stdout = "";
-                    stderr = "";
-                    options.listeners = {
-                        stdout: function (data) { return (stdout += data.toString()); },
-                        stderr: function (data) { return (stderr += data.toString()); },
-                    };
-                    return [4, (0, exec_1.exec)(commandLine, args, options)];
-                case 1:
-                    code = _a.sent();
-                    return [2, { code: code, stdout: stdout, stderr: stderr }];
-            }
-        });
-    });
+const exec_1 = __nccwpck_require__(1514);
+async function exec(commandLine, args, options) {
+    options = options || {};
+    let stdout = "";
+    let stderr = "";
+    options.listeners = {
+        stdout: (data) => (stdout += data.toString()),
+        stderr: (data) => (stderr += data.toString()),
+    };
+    const code = await (0, exec_1.exec)(commandLine, args, options);
+    return { code, stdout, stderr };
 }
 exports["default"] = exec;
 
@@ -303,103 +180,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRepositoryContent = exports.getPullRequestFiles = exports.listRepositoryPullRequests = exports.createCommitStatus = exports.getClient = void 0;
-var github = __importStar(__nccwpck_require__(5438));
+const github = __importStar(__nccwpck_require__(5438));
 function getClient(token) {
     return github.getOctokit(token);
 }
 exports.getClient = getClient;
-function createCommitStatus(client, options) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, client.rest.repos.createCommitStatus(options)];
-                case 1:
-                    response = _a.sent();
-                    return [2, response.data];
-            }
-        });
-    });
+async function createCommitStatus(client, options) {
+    const response = await client.rest.repos.createCommitStatus(options);
+    return response.data;
 }
 exports.createCommitStatus = createCommitStatus;
-function listRepositoryPullRequests(client, options) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, client.paginate(client.rest.pulls.list, options)];
-                case 1: return [2, _a.sent()];
-            }
-        });
-    });
+async function listRepositoryPullRequests(client, options) {
+    return await client.paginate(client.rest.pulls.list, options);
 }
 exports.listRepositoryPullRequests = listRepositoryPullRequests;
-function getPullRequestFiles(client, options) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, client.paginate(client.rest.pulls.listFiles, options)];
-                case 1: return [2, _a.sent()];
-            }
-        });
-    });
+async function getPullRequestFiles(client, options) {
+    return await client.paginate(client.rest.pulls.listFiles, options);
 }
 exports.getPullRequestFiles = getPullRequestFiles;
-function getRepositoryContent(client, options) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _b.trys.push([0, 2, , 3]);
-                    return [4, client.rest.repos.getContent(options)];
-                case 1:
-                    response = _b.sent();
-                    return [2, response.data];
-                case 2:
-                    _a = _b.sent();
-                    return [2, null];
-                case 3: return [2];
-            }
-        });
-    });
+async function getRepositoryContent(client, options) {
+    try {
+        const response = await client.rest.repos.getContent(options);
+        return response.data;
+    }
+    catch {
+        return null;
+    }
 }
 exports.getRepositoryContent = getRepositoryContent;
 
@@ -436,7 +244,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getInputs = void 0;
-var core = __importStar(__nccwpck_require__(2186));
+const core = __importStar(__nccwpck_require__(2186));
 function getInputs() {
     return {
         defaultBranch: core.getInput("default-branch", { required: true }),
@@ -461,17 +269,6 @@ exports.getInputs = getInputs;
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -495,329 +292,189 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var fs = __importStar(__nccwpck_require__(7147));
-var core = __importStar(__nccwpck_require__(2186));
-var github = __importStar(__nccwpck_require__(5438));
-var webhook_1 = __nccwpck_require__(1095);
-var changes_1 = __nccwpck_require__(8654);
-var githubApi = __importStar(__nccwpck_require__(2565));
-var inputs_1 = __nccwpck_require__(6180);
-var message = __importStar(__nccwpck_require__(3307));
-function run() {
-    return __awaiter(this, void 0, void 0, function () {
-        var inputs, client, pullRequest, payload, details, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 5, , 6]);
-                    core.startGroup("Inputs");
-                    inputs = (0, inputs_1.getInputs)();
-                    core.info("defaultBranch: ".concat(inputs.defaultBranch));
-                    core.info("haltFile: ".concat(inputs.haltFile));
-                    core.info("statusContext: ".concat(inputs.statusContext));
-                    core.info("statusTargetUrl: ".concat(inputs.statusTargetUrl));
-                    core.info("githubToken: ".concat(inputs.githubToken));
-                    core.endGroup();
-                    client = githubApi.getClient(inputs.githubToken);
-                    if (!(github.context.ref === "refs/heads/".concat(inputs.defaultBranch))) return [3, 2];
-                    return [4, handleMain(inputs, client)];
-                case 1: return [2, _a.sent()];
-                case 2:
-                    pullRequest = github.context.payload.pull_request;
-                    if (!pullRequest) return [3, 4];
-                    return [4, handlePullRequest(inputs, client, pullRequest)];
-                case 3: return [2, _a.sent()];
-                case 4:
-                    payload = Object.keys(github.context.payload);
-                    details = [
-                        "event: ".concat(github.context.eventName),
-                        "ref: ".concat(github.context.ref),
-                        "payload: [".concat(payload.join(", "), "]"),
-                    ];
-                    core.info("Ignoring:\n  ".concat(details.join("\n  ")));
-                    return [3, 6];
-                case 5:
-                    error_1 = _a.sent();
-                    if (error_1 instanceof Error) {
-                        core.error("".concat(error_1.name, ": ").concat(error_1.message, "\n").concat(error_1.stack));
-                        core.setFailed(error_1.message);
-                    }
-                    else if (typeof error_1 === "string") {
-                        core.error(error_1);
-                        core.setFailed(error_1);
-                    }
-                    else {
-                        core.error("Non-Error exception");
-                        core.setFailed("Non-Error exception");
-                    }
-                    return [3, 6];
-                case 6: return [2];
-            }
-        });
-    });
+const fs = __importStar(__nccwpck_require__(7147));
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const webhook_1 = __nccwpck_require__(1095);
+const changes_1 = __nccwpck_require__(8654);
+const githubApi = __importStar(__nccwpck_require__(2565));
+const inputs_1 = __nccwpck_require__(6180);
+const message = __importStar(__nccwpck_require__(3307));
+async function run() {
+    try {
+        core.startGroup("Inputs");
+        const inputs = (0, inputs_1.getInputs)();
+        core.info(`defaultBranch: ${inputs.defaultBranch}`);
+        core.info(`haltFile: ${inputs.haltFile}`);
+        core.info(`statusContext: ${inputs.statusContext}`);
+        core.info(`statusTargetUrl: ${inputs.statusTargetUrl}`);
+        core.info(`githubToken: ${inputs.githubToken}`);
+        core.endGroup();
+        const client = githubApi.getClient(inputs.githubToken);
+        if (github.context.ref === `refs/heads/${inputs.defaultBranch}`) {
+            return await handleMain(inputs, client);
+        }
+        const pullRequest = github.context.payload.pull_request;
+        if (pullRequest) {
+            return await handlePullRequest(inputs, client, pullRequest);
+        }
+        const payload = Object.keys(github.context.payload);
+        const details = [
+            `event: ${github.context.eventName}`,
+            `ref: ${github.context.ref}`,
+            `payload: [${payload.join(", ")}]`,
+        ];
+        core.info(`Ignoring:\n  ${details.join("\n  ")}`);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.error(`${error.name}: ${error.message}\n${error.stack}`);
+            core.setFailed(error.message);
+        }
+        else if (typeof error === "string") {
+            core.error(error);
+            core.setFailed(error);
+        }
+        else {
+            core.error("Non-Error exception");
+            core.setFailed("Non-Error exception");
+        }
+    }
 }
-function handleMain(inputs, client) {
-    return __awaiter(this, void 0, void 0, function () {
-        var changes, msg;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, (0, changes_1.getChangesInPush)(inputs.defaultBranch)];
-                case 1:
-                    changes = _a.sent();
-                    if (!changes.additions.includes(inputs.haltFile)) return [3, 5];
-                    core.startGroup("".concat(inputs.defaultBranch, ":").concat(inputs.haltFile, " added"));
-                    msg = message.fromContent(fs.readFileSync(inputs.haltFile).toString());
-                    core.info("Halting all open PRs: ".concat(msg.title));
-                    return [4, haltOpenPullRequests(client, github.context, inputs, msg)];
-                case 2:
-                    _a.sent();
-                    return [4, addWorkflowSummary(msg)];
-                case 3:
-                    _a.sent();
-                    return [4, sendSlackNotifications(inputs, msg)];
-                case 4:
-                    _a.sent();
-                    core.endGroup();
-                    _a.label = 5;
-                case 5:
-                    if (!changes.removals.includes(inputs.haltFile)) return [3, 8];
-                    core.startGroup("".concat(inputs.defaultBranch, ":").concat(inputs.haltFile, " removed"));
-                    core.info("Un-halting all open PRs");
-                    return [4, unhaltOpenPullRequests(client, github.context, inputs)];
-                case 6:
-                    _a.sent();
-                    return [4, sendSlackNotifications(inputs)];
-                case 7:
-                    _a.sent();
-                    core.endGroup();
-                    _a.label = 8;
-                case 8: return [2];
-            }
-        });
-    });
+async function handleMain(inputs, client) {
+    const changes = await (0, changes_1.getChangesInPush)(inputs.defaultBranch);
+    if (changes.additions.includes(inputs.haltFile)) {
+        core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} added`);
+        const msg = message.fromContent(fs.readFileSync(inputs.haltFile).toString());
+        core.info(`Halting all open PRs: ${msg.title}`);
+        await haltOpenPullRequests(client, github.context, inputs, msg);
+        await addWorkflowSummary(msg);
+        await sendSlackNotifications(inputs, msg);
+        core.endGroup();
+    }
+    if (changes.removals.includes(inputs.haltFile)) {
+        core.startGroup(`${inputs.defaultBranch}:${inputs.haltFile} removed`);
+        core.info("Un-halting all open PRs");
+        await unhaltOpenPullRequests(client, github.context, inputs);
+        await sendSlackNotifications(inputs);
+        core.endGroup();
+    }
 }
-function handlePullRequest(inputs, client, pullRequest) {
-    return __awaiter(this, void 0, void 0, function () {
-        var haltBranch, haltFile, haltFileContents, changes, msg;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    haltBranch = inputs.haltBranch || inputs.defaultBranch;
-                    return [4, githubApi.getRepositoryContent(client, __assign(__assign({}, github.context.repo), { path: inputs.haltFile, ref: haltBranch }))];
-                case 1:
-                    haltFile = _a.sent();
-                    haltFileContents = haltFile && "content" in haltFile ? decodeBase64(haltFile.content) : null;
-                    if (!(haltFileContents === null)) return [3, 3];
-                    core.info("Repository not halted");
-                    return [4, unhaltPullRequest(client, github.context, inputs, pullRequest)];
-                case 2: return [2, _a.sent()];
-                case 3: return [4, (0, changes_1.getChangesInPullRequest)(client, github.context, pullRequest)];
-                case 4:
-                    changes = _a.sent();
-                    if (!changes.removals.includes(inputs.haltFile)) return [3, 6];
-                    core.info("".concat(haltBranch, ":").concat(inputs.haltFile, " exists, but removed"));
-                    return [4, unhaltPullRequest(client, github.context, inputs, pullRequest)];
-                case 5: return [2, _a.sent()];
-                case 6:
-                    core.info("".concat(haltBranch, ":").concat(inputs.haltFile, " exists"));
-                    msg = message.fromContent(haltFileContents);
-                    return [4, haltPullRequest(client, github.context, inputs, pullRequest, msg)];
-                case 7:
-                    _a.sent();
-                    return [4, addWorkflowSummary(msg)];
-                case 8:
-                    _a.sent();
-                    return [2];
-            }
-        });
+async function handlePullRequest(inputs, client, pullRequest) {
+    const haltBranch = inputs.haltBranch || inputs.defaultBranch;
+    const haltFile = await githubApi.getRepositoryContent(client, {
+        ...github.context.repo,
+        path: inputs.haltFile,
+        ref: haltBranch,
     });
+    const haltFileContents = haltFile && "content" in haltFile ? decodeBase64(haltFile.content) : null;
+    if (haltFileContents === null) {
+        core.info("Repository not halted");
+        return await unhaltPullRequest(client, github.context, inputs, pullRequest);
+    }
+    const changes = await (0, changes_1.getChangesInPullRequest)(client, github.context, pullRequest);
+    if (changes.removals.includes(inputs.haltFile)) {
+        core.info(`${haltBranch}:${inputs.haltFile} exists, but removed`);
+        return await unhaltPullRequest(client, github.context, inputs, pullRequest);
+    }
+    core.info(`${haltBranch}:${inputs.haltFile} exists`);
+    const msg = message.fromContent(haltFileContents);
+    await haltPullRequest(client, github.context, inputs, pullRequest, msg);
+    await addWorkflowSummary(msg);
 }
 function decodeBase64(input) {
-    var buff = Buffer.from(input, "base64");
+    const buff = Buffer.from(input, "base64");
     return buff.toString("utf-8");
 }
-function haltOpenPullRequests(client, context, inputs, message) {
-    return __awaiter(this, void 0, void 0, function () {
-        var pullRequests;
-        var _this = this;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, githubApi.listRepositoryPullRequests(client, __assign(__assign({}, context.repo), { state: "open" }))];
-                case 1:
-                    pullRequests = _a.sent();
-                    return [4, pullRequests.forEach(function (pullRequest) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4, haltPullRequest(client, context, inputs, pullRequest, message)];
-                                    case 1:
-                                        _a.sent();
-                                        return [2];
-                                }
-                            });
-                        }); })];
-                case 2:
-                    _a.sent();
-                    return [2];
-            }
-        });
+async function haltOpenPullRequests(client, context, inputs, message) {
+    const pullRequests = await githubApi.listRepositoryPullRequests(client, {
+        ...context.repo,
+        state: "open",
+    });
+    await pullRequests.forEach(async (pullRequest) => {
+        await haltPullRequest(client, context, inputs, pullRequest, message);
     });
 }
-function unhaltOpenPullRequests(client, context, inputs) {
-    return __awaiter(this, void 0, void 0, function () {
-        var pullRequests;
-        var _this = this;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, githubApi.listRepositoryPullRequests(client, __assign(__assign({}, context.repo), { state: "open" }))];
-                case 1:
-                    pullRequests = _a.sent();
-                    return [4, pullRequests.forEach(function (pullRequest) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4, unhaltPullRequest(client, context, inputs, pullRequest)];
-                                    case 1:
-                                        _a.sent();
-                                        return [2];
-                                }
-                            });
-                        }); })];
-                case 2:
-                    _a.sent();
-                    return [2];
-            }
-        });
+async function unhaltOpenPullRequests(client, context, inputs) {
+    const pullRequests = await githubApi.listRepositoryPullRequests(client, {
+        ...context.repo,
+        state: "open",
+    });
+    await pullRequests.forEach(async (pullRequest) => {
+        await unhaltPullRequest(client, context, inputs, pullRequest);
     });
 }
-function haltPullRequest(client, context, inputs, pullRequest, message) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    console.info("Setting halted status for PR #".concat(pullRequest.number));
-                    return [4, githubApi.createCommitStatus(client, __assign(__assign({}, context.repo), { sha: pullRequest.head.sha, context: inputs.statusContext, state: "failure", description: message.title, target_url: inputs.statusTargetUrl }))];
-                case 1:
-                    _a.sent();
-                    return [2];
-            }
-        });
+async function haltPullRequest(client, context, inputs, pullRequest, message) {
+    console.info(`Setting halted status for PR #${pullRequest.number}`);
+    await githubApi.createCommitStatus(client, {
+        ...context.repo,
+        sha: pullRequest.head.sha,
+        context: inputs.statusContext,
+        state: "failure",
+        description: message.title,
+        target_url: inputs.statusTargetUrl,
     });
 }
-function unhaltPullRequest(client, context, inputs, pullRequest) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    console.info("Setting un-halted status for PR #".concat(pullRequest.number));
-                    return [4, githubApi.createCommitStatus(client, __assign(__assign({}, context.repo), { sha: pullRequest.head.sha, context: inputs.statusContext, state: "success", description: "Merge away", target_url: inputs.statusTargetUrl }))];
-                case 1:
-                    _a.sent();
-                    return [2];
-            }
-        });
+async function unhaltPullRequest(client, context, inputs, pullRequest) {
+    console.info(`Setting un-halted status for PR #${pullRequest.number}`);
+    await githubApi.createCommitStatus(client, {
+        ...context.repo,
+        sha: pullRequest.head.sha,
+        context: inputs.statusContext,
+        state: "success",
+        description: "Merge away",
+        target_url: inputs.statusTargetUrl,
     });
 }
-function addWorkflowSummary(msg) {
-    return __awaiter(this, void 0, void 0, function () {
-        var summary;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    summary = core.summary.addHeading(msg.title);
-                    if (msg.summary) {
-                        summary.addRaw(msg.summary);
-                    }
-                    return [4, summary.write()];
-                case 1:
-                    _a.sent();
-                    return [2];
-            }
-        });
-    });
+async function addWorkflowSummary(msg) {
+    const summary = core.summary.addHeading(msg.title);
+    if (msg.summary) {
+        summary.addRaw(msg.summary);
+    }
+    await summary.write();
 }
-function sendSlackNotifications(inputs, msg) {
-    return __awaiter(this, void 0, void 0, function () {
-        var _a, color, title, value, slack, webhook, promises, results;
-        return __generator(this, function (_b) {
-            if (!inputs.slackWebhook) {
-                core.debug("Skipping Slack notification (no webhook)");
-                return [2];
-            }
-            _a = msg
-                ? {
-                    color: "failure",
-                    title: "CI/CD on ".concat(github.context.repo, " has been halted"),
-                    value: message.wasOriginallyEmpty(msg) ? "" : message.toString(msg),
-                }
-                : {
-                    color: "success",
-                    title: "CI/CD on ".concat(github.context.repo, " is no longer halted"),
-                    value: "",
-                }, color = _a.color, title = _a.title, value = _a.value;
-            slack = new webhook_1.IncomingWebhook(inputs.slackWebhook);
-            webhook = {
-                attachments: [
+async function sendSlackNotifications(inputs, msg) {
+    if (!inputs.slackWebhook) {
+        core.debug("Skipping Slack notification (no webhook)");
+        return;
+    }
+    const { color, title, value } = msg
+        ? {
+            color: "failure",
+            title: `CI/CD on ${github.context.repo} has been halted`,
+            value: message.wasOriginallyEmpty(msg) ? "" : message.toString(msg),
+        }
+        : {
+            color: "success",
+            title: `CI/CD on ${github.context.repo} is no longer halted`,
+            value: "",
+        };
+    const slack = new webhook_1.IncomingWebhook(inputs.slackWebhook);
+    const webhook = {
+        attachments: [
+            {
+                fallback: title,
+                color,
+                fields: [
                     {
-                        fallback: title,
-                        color: color,
-                        fields: [
-                            {
-                                title: title,
-                                value: value,
-                                short: false,
-                            },
-                        ],
+                        title,
+                        value,
+                        short: false,
                     },
                 ],
-            };
-            promises = inputs.slackChannels
-                ? inputs.slackChannels.map(function (channel) {
-                    webhook.channel = channel;
-                    return slack.send(webhook);
-                })
-                : [slack.send(webhook)];
-            core.debug("Sending ".concat(promises.length, " Slack notification(s)"));
-            results = Promise.all(promises);
-            core.debug("Response(s): ".concat(results));
-            return [2];
-        });
-    });
+            },
+        ],
+    };
+    const promises = inputs.slackChannels
+        ? inputs.slackChannels.map((channel) => {
+            webhook.channel = channel;
+            return slack.send(webhook);
+        })
+        : [slack.send(webhook)];
+    core.debug(`Sending ${promises.length} Slack notification(s)`);
+    const results = Promise.all(promises);
+    core.debug(`Response(s): ${results}`);
 }
 run();
 
@@ -831,13 +488,13 @@ run();
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.toString = exports.fromContent = exports.wasOriginallyEmpty = void 0;
-var DEFAULT_TITLE = "Merges halted";
+const DEFAULT_TITLE = "Merges halted";
 function wasOriginallyEmpty(message) {
     return message.title === DEFAULT_TITLE;
 }
 exports.wasOriginallyEmpty = wasOriginallyEmpty;
 function fromContent(contents) {
-    var lines = contents.trim() === "" ? [] : contents.split("\n");
+    const lines = contents.trim() === "" ? [] : contents.split("\n");
     switch (lines.length) {
         case 0:
             return {
@@ -862,7 +519,7 @@ function fromContent(contents) {
 exports.fromContent = fromContent;
 function toString(message) {
     return message.summary
-        ? "".concat(message.title, "\n").concat(message.summary)
+        ? `${message.title}\n${message.summary}`
         : message.title;
 }
 exports.toString = toString;
