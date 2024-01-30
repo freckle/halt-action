@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches: main
-    
+
 # explicit permissions so Dependabot can run this
 permissions:
   contents: read
@@ -14,5 +14,5 @@ jobs:
   example:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./
