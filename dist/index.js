@@ -405,14 +405,14 @@ async function unhaltOpenPullRequests(client, context, inputs) {
         await unhaltPullRequest(client, context, inputs, pullRequest);
     });
 }
-async function haltPullRequest(client, context, inputs, pullRequest, message) {
+async function haltPullRequest(client, context, inputs, pullRequest, msg) {
     console.info(`Setting halted status for PR #${pullRequest.number}`);
     await githubApi.createCommitStatus(client, {
         ...context.repo,
         sha: pullRequest.head.sha,
         context: inputs.statusContext,
         state: "failure",
-        description: message.title,
+        description: message.toStatusDescription(msg),
         target_url: inputs.statusTargetUrl,
     });
 }
@@ -487,7 +487,7 @@ run();
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toString = exports.fromContent = exports.wasOriginallyEmpty = void 0;
+exports.toString = exports.toStatusDescription = exports.fromContent = exports.wasOriginallyEmpty = void 0;
 const DEFAULT_TITLE = "Merges halted";
 function wasOriginallyEmpty(message) {
     return message.title === DEFAULT_TITLE;
@@ -517,6 +517,15 @@ function fromContent(contents) {
     }
 }
 exports.fromContent = fromContent;
+function toStatusDescription(message) {
+    const { title } = message;
+    const maxLength = 140;
+    if (title.length > maxLength) {
+        return `${title.slice(0, maxLength - 3)}...`;
+    }
+    return title;
+}
+exports.toStatusDescription = toStatusDescription;
 function toString(message) {
     return message.summary
         ? `${message.title}\n${message.summary}`
