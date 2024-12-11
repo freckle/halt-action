@@ -68,6 +68,25 @@ paragraph or two.
 `);
 });
 
+test("toStatusDescription short", () => {
+  const msg = message.fromContent("This is a message");
+
+  expect(message.toStatusDescription(msg)).toEqual(msg.title);
+});
+
+test("toStatusDescription long", () => {
+  const msg = message.fromContent(
+    "This is a super long message that is much longer than 140 characters and " +
+      "it just keeps going and why would anyone make a HALT file with a title " +
+      "this long?",
+  );
+  const description = message.toStatusDescription(msg);
+
+  expect(description.length).toEqual(140);
+  expect(description.slice(0, 20)).toEqual("This is a super long");
+  expect(description.slice(-20)).toEqual(" HALT file with a...");
+});
+
 test("toString preserves content", () => {
   const single = "We're down";
   const multi = `We're down
