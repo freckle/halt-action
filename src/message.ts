@@ -35,6 +35,17 @@ export function fromContent(contents: string): Message {
   }
 }
 
+export function toStatusDescription(message: Message): string {
+  const { title } = message;
+  const maxLength = 140;
+
+  if (title.length > maxLength) {
+    return `${title.slice(0, maxLength - 3)}...`;
+  }
+
+  return title;
+}
+
 export function toString(message: Message): string {
   return message.summary
     ? `${message.title}\n${message.summary}`

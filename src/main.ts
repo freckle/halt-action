@@ -160,7 +160,7 @@ async function haltPullRequest(
   context: Context,
   inputs: Inputs,
   pullRequest: PullRequest,
-  message: Message,
+  msg: Message,
 ): Promise<void> {
   console.info(`Setting halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
@@ -168,7 +168,7 @@ async function haltPullRequest(
     sha: pullRequest.head.sha,
     context: inputs.statusContext,
     state: "failure",
-    description: message.title,
+    description: message.toStatusDescription(msg),
     target_url: inputs.statusTargetUrl,
   });
 }
