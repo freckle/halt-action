@@ -162,6 +162,20 @@ async function haltPullRequest(
   pullRequest: PullRequest,
   msg: Message,
 ): Promise<void> {
+  const statuses = await githubApi.getPullRequestStatuses(client, {
+    ...context.repo,
+    pull_number: pullRequest.number,
+  });
+
+  const status = statuses.find((s) => {
+    return s.context === inputs.statusContext && s.state === "failure";
+  });
+
+  if (status) {
+    core.info(`PR #${pullRequest.number} is already halted`);
+    return;
+  }
+
   core.info(`Setting halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
     ...context.repo,
