@@ -67,3 +67,30 @@ export async function getRepositoryContent(
     return null;
   }
 }
+
+type GetPullRequestParameters =
+  Endpoints["GET /repos/{owner}/{repo}/pulls/{pull_number}"]["parameters"];
+
+type ListCommitStatusesResponse =
+  Endpoints["GET /repos/{owner}/{repo}/commits/{ref}/statuses"]["response"];
+
+export async function getPullRequestStatuses(
+  client: GitHubClient,
+  options: GetPullRequestParameters,
+): Promise<ListCommitStatusesResponse["data"]> {
+  try {
+    const { owner, repo, pull_number } = options;
+    const { data: pr } = await client.rest.pulls.get(options);
+    const { data: statuses } = await client.rest.repos.listCommitStatusesForRef(
+      {
+        owner,
+        repo,
+        ref: pr.head.sha,
+      },
+    );
+
+    return statuses;
+  } catch {
+    return []; // don't care
+  }
+}
