@@ -45,7 +45,7 @@ export async function getChangesInPush(branch: string): Promise<Changes> {
     }
 
     core.info(
-      `Commit ${base} not found, fetching ${depth} more along ${branch}`
+      `Commit ${base} not found, fetching ${depth} more along ${branch}`,
     );
     await exec("git", ["fetch", `--deepen=${depth}`, "origin", branch]);
   }
@@ -104,7 +104,7 @@ export function parseGitLog(stdout: string): Changes {
 export async function getChangesInPullRequest(
   client: GitHubClient,
   context: Context,
-  pullRequest: PullRequest
+  pullRequest: PullRequest,
 ): Promise<Changes> {
   const changes = await githubApi.getPullRequestFiles(client, {
     ...context.repo,
