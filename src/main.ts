@@ -162,7 +162,7 @@ async function haltPullRequest(
   pullRequest: PullRequest,
   msg: Message,
 ): Promise<void> {
-  console.info(`Setting halted status for PR #${pullRequest.number}`);
+  core.info(`Setting halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
     ...context.repo,
     sha: pullRequest.head.sha,
@@ -179,7 +179,7 @@ async function unhaltPullRequest(
   inputs: Inputs,
   pullRequest: PullRequest,
 ): Promise<void> {
-  console.info(`Setting un-halted status for PR #${pullRequest.number}`);
+  core.info(`Setting un-halted status for PR #${pullRequest.number}`);
   await githubApi.createCommitStatus(client, {
     ...context.repo,
     sha: pullRequest.head.sha,
