@@ -1,4 +1,4 @@
-import * as message from "./message";
+import * as message from "./message.js"
 
 test("wasOriginallyEmpty", () => {
   const wasOriginallyEmpty = (x: string): boolean => {

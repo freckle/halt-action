@@ -1,4 +1,4 @@
-import { parseGitLog } from "./changes";
+import { parseGitLog } from "./changes.js"
 
 test("parseGitLog", async () => {
   // NB. ensures files deleted (or added) in commits then added (or deleted)
