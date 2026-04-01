@@ -19,7 +19,7 @@
   "dependencies": {
     "@actions/core": "^3.0.0",
     "@actions/exec": "^3.0.0",
-    "@actions/github": "^7.0.0",
+    "@actions/github": "^9.0.0",
     "@slack/webhook": "^7.0.8"
   },
   "devDependencies": {
