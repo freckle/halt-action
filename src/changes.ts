@@ -8,11 +8,11 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
-import type { Context } from "./context";
-import exec from "./exec";
-import type { GitHubClient } from "./github-api";
-import * as githubApi from "./github-api";
-import type { PullRequest } from "./pull-request";
+import type { Context } from "./context.js"
+import exec from "./exec.js"
+import type { GitHubClient } from "./github-api.js"
+import * as githubApi from "./github-api.js"
+import type { PullRequest } from "./pull-request.js"
 
 export type Changes = {
   additions: string[];
