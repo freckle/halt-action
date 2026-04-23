@@ -23,7 +23,7 @@
     "@slack/webhook": "^7.0.9"
   },
   "devDependencies": {
-    "@actions/glob": "^0.6.1",
+    "@actions/glob": "^0.7.0",
     "@octokit/types": "^15.0.2",
     "@types/node": "^24.12.2",
     "@vercel/ncc": "^0.38.4",
