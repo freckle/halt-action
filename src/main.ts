@@ -35,12 +35,7 @@ async function run() {
     const pullRequest = github.context.payload.pull_request as PullRequest;
 
     if (pullRequest) {
-      return await handlePullRequest(
-        inputs,
-        client,
-        pullRequest,
-        inputs.ignoreLabels,
-      );
+      return await handlePullRequest(inputs, client, pullRequest);
     }
 
     const payload = Object.keys(github.context.payload);
@@ -92,10 +87,9 @@ async function handlePullRequest(
   inputs: Inputs,
   client: GitHubClient,
   pullRequest: PullRequest,
-  ignoreLabels: string[],
 ): Promise<void> {
   pullRequest.labels.forEach((l: Label) => {
-    if (ignoreLabels.includes(l.name)) {
+    if (inputs.ignoreLabels.includes(l.name)) {
       core.info(
         `Ignoring Pull Request because label ${l.name} is in ignore-labels`,
       );
