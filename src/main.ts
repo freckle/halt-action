@@ -88,12 +88,15 @@ async function handlePullRequest(
   client: GitHubClient,
   pullRequest: PullRequest,
 ): Promise<void> {
-  pullRequest.labels.forEach((l: Label) => {
+  await pullRequest.labels.forEach(async (l: Label) => {
     if (inputs.ignoreLabels.includes(l.name)) {
-      core.info(
-        `Ignoring Pull Request because label ${l.name} is in ignore-labels`,
+      core.info(`PR has label ${l.name} in ignore-labels`);
+      return await unhaltPullRequest(
+        client,
+        github.context,
+        inputs,
+        pullRequest,
       );
-      return;
     }
   });
 
