@@ -4,15 +4,15 @@ import * as github from "@actions/github";
 
 import type { IncomingWebhookSendArguments } from "@slack/webhook";
 import { IncomingWebhook } from "@slack/webhook";
-import { getChangesInPush, getChangesInPullRequest } from "./changes.js"
-import type { Context } from "./context.js"
-import type { GitHubClient } from "./github-api.js"
-import * as githubApi from "./github-api.js"
-import type { Inputs } from "./inputs.js"
-import { getInputs } from "./inputs.js"
-import type { PullRequest } from "./pull-request.js"
-import type { Message } from "./message.js"
-import * as message from "./message.js"
+import { getChangesInPush, getChangesInPullRequest } from "./changes.js";
+import type { Context } from "./context.js";
+import type { GitHubClient } from "./github-api.js";
+import * as githubApi from "./github-api.js";
+import type { Inputs } from "./inputs.js";
+import { getInputs } from "./inputs.js";
+import type { PullRequest } from "./pull-request.js";
+import type { Message } from "./message.js";
+import * as message from "./message.js";
 
 async function run() {
   try {
