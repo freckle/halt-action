@@ -4,6 +4,7 @@ export type Inputs = {
   defaultBranch: string;
   haltBranch: string | undefined;
   haltFile: string;
+  ignoreLabels: string[];
   statusContext: string;
   statusTargetUrl: string | undefined;
   slackWebhook: string | undefined;
@@ -16,6 +17,7 @@ export function getInputs(): Inputs {
     defaultBranch: core.getInput("default-branch", { required: true }),
     haltBranch: core.getInput("halt-branch", { required: false }),
     haltFile: core.getInput("halt-file", { required: true }),
+    ignoreLabels: core.getMultilineInput("ignore-labels", { required: false }),
     statusContext: core.getInput("status-context", { required: true }),
     statusTargetUrl: core.getInput("status-target-url", { required: false }),
     slackWebhook: core.getInput("slack-webhook", { required: false }),
