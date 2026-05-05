@@ -10,7 +10,7 @@ import type { GitHubClient } from "./github-api.js";
 import * as githubApi from "./github-api.js";
 import type { Inputs } from "./inputs.js";
 import { getInputs } from "./inputs.js";
-import type { PullRequest } from "./pull-request.js";
+import type { PullRequest, Label } from "./pull-request.js";
 import type { Message } from "./message.js";
 import * as message from "./message.js";
 
@@ -20,6 +20,7 @@ async function run() {
     const inputs = getInputs();
     core.info(`defaultBranch: ${inputs.defaultBranch}`);
     core.info(`haltFile: ${inputs.haltFile}`);
+    core.info(`ignoreLabels: ${inputs.ignoreLabels.join(", ")}`);
     core.info(`statusContext: ${inputs.statusContext}`);
     core.info(`statusTargetUrl: ${inputs.statusTargetUrl}`);
     core.info(`githubToken: ${inputs.githubToken}`);
@@ -34,7 +35,12 @@ async function run() {
     const pullRequest = github.context.payload.pull_request as PullRequest;
 
     if (pullRequest) {
-      return await handlePullRequest(inputs, client, pullRequest);
+      return await handlePullRequest(
+        inputs,
+        client,
+        pullRequest,
+        inputs.ignoreLabels,
+      );
     }
 
     const payload = Object.keys(github.context.payload);
@@ -86,7 +92,17 @@ async function handlePullRequest(
   inputs: Inputs,
   client: GitHubClient,
   pullRequest: PullRequest,
+  ignoreLabels: string[],
 ): Promise<void> {
+  pullRequest.labels.forEach((l: Label) => {
+    if (ignoreLabels.includes(l.name)) {
+      core.info(
+        `Ignoring Pull Request because label ${l.name} is in ignore-labels`,
+      );
+      return;
+    }
+  });
+
   const haltBranch = inputs.haltBranch || inputs.defaultBranch;
   const haltFile = await githubApi.getRepositoryContent(client, {
     ...github.context.repo,

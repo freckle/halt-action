@@ -3,4 +3,9 @@ export type PullRequest = {
   head: {
     sha: string;
   };
+  labels: Label[];
+};
+
+export type Label = {
+  name: string;
 };
