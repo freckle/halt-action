@@ -69330,6 +69330,7 @@ function getInputs() {
         defaultBranch: core.getInput("default-branch", { required: true }),
         haltBranch: core.getInput("halt-branch", { required: false }),
         haltFile: core.getInput("halt-file", { required: true }),
+        ignoreLabels: core.getMultilineInput("ignore-labels", { required: false }),
         statusContext: core.getInput("status-context", { required: true }),
         statusTargetUrl: core.getInput("status-target-url", { required: false }),
         slackWebhook: core.getInput("slack-webhook", { required: false }),
@@ -69397,6 +69398,7 @@ async function run() {
         const inputs = getInputs();
         core.info(`defaultBranch: ${inputs.defaultBranch}`);
         core.info(`haltFile: ${inputs.haltFile}`);
+        core.info(`ignoreLabels: ${inputs.ignoreLabels.join(", ")}`);
         core.info(`statusContext: ${inputs.statusContext}`);
         core.info(`statusTargetUrl: ${inputs.statusTargetUrl}`);
         core.info(`githubToken: ${inputs.githubToken}`);
@@ -69407,7 +69409,7 @@ async function run() {
         }
         const pullRequest = github.context.payload.pull_request;
         if (pullRequest) {
-            return await handlePullRequest(inputs, client, pullRequest);
+            return await handlePullRequest(inputs, client, pullRequest, inputs.ignoreLabels);
         }
         const payload = Object.keys(github.context.payload);
         const details = [
@@ -69451,7 +69453,13 @@ async function handleMain(inputs, client) {
         core.endGroup();
     }
 }
-async function handlePullRequest(inputs, client, pullRequest) {
+async function handlePullRequest(inputs, client, pullRequest, ignoreLabels) {
+    pullRequest.labels.forEach((l) => {
+        if (ignoreLabels.includes(l.name)) {
+            core.info(`Ignoring Pull Request because label ${l.name} is in ignore-labels`);
+            return;
+        }
+    });
     const haltBranch = inputs.haltBranch || inputs.defaultBranch;
     const haltFile = await getRepositoryContent(client, {
         ...github.context.repo,
