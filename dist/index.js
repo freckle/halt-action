@@ -69409,7 +69409,7 @@ async function run() {
         }
         const pullRequest = github.context.payload.pull_request;
         if (pullRequest) {
-            return await handlePullRequest(inputs, client, pullRequest, inputs.ignoreLabels);
+            return await handlePullRequest(inputs, client, pullRequest);
         }
         const payload = Object.keys(github.context.payload);
         const details = [
@@ -69453,11 +69453,11 @@ async function handleMain(inputs, client) {
         core.endGroup();
     }
 }
-async function handlePullRequest(inputs, client, pullRequest, ignoreLabels) {
-    pullRequest.labels.forEach((l) => {
-        if (ignoreLabels.includes(l.name)) {
-            core.info(`Ignoring Pull Request because label ${l.name} is in ignore-labels`);
-            return;
+async function handlePullRequest(inputs, client, pullRequest) {
+    await pullRequest.labels.forEach(async (l) => {
+        if (inputs.ignoreLabels.includes(l.name)) {
+            core.info(`PR has label ${l.name} in ignore-labels`);
+            return await unhaltPullRequest(client, github.context, inputs, pullRequest);
         }
     });
     const haltBranch = inputs.haltBranch || inputs.defaultBranch;
