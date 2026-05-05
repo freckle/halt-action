@@ -28,6 +28,7 @@ jobs:
         with: # all optional, defaults shown
           default-branch: main
           halt-file: .github/HALT
+          ignore-labels: null
           status-context: halt
           status-target-url: null
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,6 +63,23 @@ line will become the PR status description. The remaining lines, if there are
 any, will be added as a [Workflow Job Summary][workflow-job-summary].
 
 [workflow-job-summary]: https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-job-summary
+
+## Ignore Labels
+
+Sometimes you may open a PR that _might_ fix the reason you are halted, or maybe
+it is part of a fix. Therefore, you don't want to remove the halt file as part
+of this PR, but you do need that PR to not be halted.
+
+To support such cases, you can configure `ignore-labels`:
+
+```yaml
+ignore-labels: |
+  HotFix
+  BypassHalt
+  FixesHalt
+```
+
+Then apply one of these labels to allow PRs through while halted.
 
 ## Inputs & Outputs
 
