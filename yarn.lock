@@ -352,14 +352,17 @@
   resolved "https://registry.yarnpkg.com/@slack/types/-/types-2.20.1.tgz#2528592813eb088691a8665d55e21ec47ddc8217"
   integrity sha512-eWX2mdt1ktpn8+40iiMc404uGrih+2fxiky3zBcPjtXKj6HLRdYlmhrPkJi7JTJm8dpXR6BWVWEDBXtaWMKD6A==
 
-"@slack/webhook@^7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@slack/webhook/-/webhook-7.1.0.tgz#00571a1b35b9e6d501ee5a47826118a69c357750"
-  integrity sha512-cVXjP1n5s9gF7EW0zi58gYhf9JQ+FDu9t0Tq4ufdJxSO6QkT4wBMjSWYGAz61Xi6eHaZlnyGu7RuzwpGERLYbw==
+"@slack/webhook@^7.2.0":
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/@slack/webhook/-/webhook-7.2.0.tgz#bec88eeb314f671978049a7ec6578524f8afec1f"
+  integrity sha512-iGL0S6NI9Bv/kg3FS0J5EaLF1kd7uw5pdrfndqz+h1yhgguiVpRL7ReJg9Cia5knS9hUSCRY5MTjeroBwxdKtw==
   dependencies:
     "@slack/types" "^2.20.1"
     "@types/node" ">=18"
+    "@types/retry" "0.12.0"
     axios "^1.16.0"
+    p-retry "^4.6.2"
+    retry "^0.13.1"
 
 "@standard-schema/spec@^1.1.0":
   version "1.1.0"
@@ -404,6 +407,11 @@
   integrity sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==
   dependencies:
     undici-types "~7.18.0"
+
+"@types/retry@0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@types/retry/-/retry-0.12.0.tgz#2b35eccfcee7d38cd72ad99232fbd58bffb3c84d"
+  integrity sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==
 
 "@vercel/ncc@^0.44.1":
   version "0.44.1"
@@ -915,6 +923,14 @@ obug@^2.1.1:
   resolved "https://registry.yarnpkg.com/obug/-/obug-2.1.1.tgz#2cba74ff241beb77d63055ddf4cd1e9f90b538be"
   integrity sha512-uTqF9MuPraAQ+IsnPf366RG4cP9RtUi7MLO1N3KEc+wb0a6yKpeL0lmk2IB1jY5KHPAlTc6T/JRdC/YqxHNwkQ==
 
+p-retry@^4.6.2:
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/p-retry/-/p-retry-4.6.2.tgz#9baae7184057edd4e17231cee04264106e092a16"
+  integrity sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==
+  dependencies:
+    "@types/retry" "0.12.0"
+    retry "^0.13.1"
+
 parse5@^8.0.1:
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-8.0.1.tgz#f43bcd2cd683efe084075333e9ce0da7d06da31e"
@@ -965,6 +981,11 @@ require-from-string@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/require-from-string/-/require-from-string-2.0.2.tgz#89a7fdd938261267318eafe14f9c32e598c36909"
   integrity sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==
+
+retry@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/retry/-/retry-0.13.1.tgz#185b1587acf67919d63b357349e03537b2484658"
+  integrity sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==
 
 rolldown@1.0.3:
   version "1.0.3"
