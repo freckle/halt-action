@@ -28,7 +28,7 @@
     "@types/node": "^24.13.3",
     "@vercel/ncc": "^0.44.1",
     "jsdom": "^29.1.1",
-    "prettier": "^3.9.5",
+    "prettier": "^3.9.6",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   }
