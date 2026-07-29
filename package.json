@@ -27,7 +27,7 @@
     "@octokit/types": "^16.0.0",
     "@types/node": "^24.13.3",
     "@vercel/ncc": "^0.44.1",
-    "jsdom": "^30.0.0",
+    "jsdom": "^30.0.1",
     "prettier": "^3.9.6",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
