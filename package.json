@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@actions/glob": "^0.7.0",
-    "@octokit/types": "^16.0.0",
+    "@octokit/types": "^17.0.0",
     "@types/node": "^24.13.3",
     "@vercel/ncc": "^0.44.1",
     "jsdom": "^30.0.1",
