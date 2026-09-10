@@ -79,7 +79,7 @@ export async function getPullRequestStatuses(
   options: GetPullRequestParameters,
 ): Promise<ListCommitStatusesResponse["data"]> {
   try {
-    const { owner, repo, pull_number } = options;
+    const { owner, repo } = options;
     const { data: pr } = await client.rest.pulls.get(options);
     const { data: statuses } = await client.rest.repos.listCommitStatusesForRef(
       {

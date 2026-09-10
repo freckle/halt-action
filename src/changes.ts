@@ -35,11 +35,11 @@ export async function getChangesInPush(branch: string): Promise<Changes> {
   const depth = 10;
   const maxAttempts = 100; // if you do a 1,000 commit push I'm sorry
 
-  let stdout = null;
+  let stdout: string | null;
   let attempts = 0;
 
   while (!(stdout = await gitDiff(spec))) {
-    if (attempts > maxAttempts) {
+    if (++attempts > maxAttempts) {
       core.warning("Not found at 1,000 commits, giving up");
       return emptyChanges;
     }
