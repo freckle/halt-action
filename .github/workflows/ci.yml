@@ -13,10 +13,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
-          cache: yarn
-          node-version-file: '.nvmrc'
-      - run: yarn install
-      - run: yarn build
-      - run: yarn test --passWithNoTests
+          cache: pnpm
+          node-version-file: ".nvmrc"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm knip
+      - run: pnpm coverage
+      - run: pnpm build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/index.js
+
+  integration:
+    needs: build
+    runs-on: ubuntu-latest
+    # this action creates commit-statuses on the PR it runs against
+    permissions:
+      contents: read
+      statuses: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist # overwrite dist/index.js
+      - uses: ./
