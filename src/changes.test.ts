@@ -1,6 +1,6 @@
-import { parseGitLog } from "./changes.js"
+import {parseGitLog} from './changes.js'
 
-test("parseGitLog", async () => {
+test('parseGitLog', async () => {
   // NB. ensures files deleted (or added) in commits then added (or deleted)
   // later, are handled correctly.
   const changes = parseGitLog(`
@@ -21,12 +21,8 @@ M       src/main.ts
 M       package.json
 6cf5d32 Update action.yml
 M       action.yml
-`);
+`)
 
-  expect(changes.additions).toEqual([
-    "package.json",
-    "src/inputs.ts",
-    "src/pull-request.ts",
-  ]);
-  expect(changes.removals).toEqual(["src/github-api.ts", "yarn-error.log"]);
-});
+  expect(changes.additions).toEqual(['package.json', 'src/inputs.ts', 'src/pull-request.ts'])
+  expect(changes.removals).toEqual(['src/github-api.ts', 'yarn-error.log'])
+})
