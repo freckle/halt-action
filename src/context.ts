@@ -1,3 +1,3 @@
-import * as github from "@actions/github";
+import * as github from '@actions/github'
 
-export type Context = typeof github.context;
+export type Context = typeof github.context

@@ -1,11 +1,11 @@
 export type PullRequest = {
-  number: number;
+  number: number
   head: {
-    sha: string;
-  };
-  labels: Label[];
-};
+    sha: string
+  }
+  labels: Label[]
+}
 
 export type Label = {
-  name: string;
-};
+  name: string
+}
