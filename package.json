@@ -29,7 +29,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@octokit/types": "^17.0.0",
-    "@types/node": "^24.13.3",
+    "@types/node": "^24.13.4",
     "@vercel/ncc": "^0.45.0",
     "@vitest/coverage-v8": "^5.0.0",
     "eslint": "^10.9.1",
