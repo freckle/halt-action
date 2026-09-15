@@ -13,13 +13,13 @@ export default defineConfig({
       // main.ts holds the action's whole control flow; the integration CI job
       // exercises it end-to-end, so it is not unit-tested here
       exclude: ["src/main.ts"],
-      // Set to the coverage the current tests actually achieve, so nothing
-      // regresses. Raised as tests are added.
+      // The template's gate. Actual coverage is 98.8% lines / 100% branches;
+      // 70 leaves room to refactor without silently allowing a collapse.
       thresholds: {
-        lines: 35,
-        branches: 72,
-        functions: 30,
-        statements: 35,
+        lines: 70,
+        branches: 70,
+        functions: 70,
+        statements: 70,
       },
     },
   },
