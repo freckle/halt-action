@@ -23,7 +23,6 @@ async function run() {
     core.info(`ignoreLabels: ${inputs.ignoreLabels.join(', ')}`)
     core.info(`statusContext: ${inputs.statusContext}`)
     core.info(`statusTargetUrl: ${inputs.statusTargetUrl}`)
-    core.info(`githubToken: ${inputs.githubToken}`)
     core.endGroup()
 
     const client = githubApi.getClient(inputs.githubToken)
