@@ -1,7 +1,7 @@
 /* Typed interface for all GitHub API interactions */
 
 import * as github from '@actions/github'
-import {Endpoints} from '@octokit/types'
+import {RestEndpointMethodTypes} from '@octokit/plugin-rest-endpoint-methods'
 
 export type GitHubClient = ReturnType<typeof github.getOctokit>
 
@@ -10,9 +10,9 @@ export function getClient(token: string): GitHubClient {
 }
 
 type CreateCommitStatusParameters =
-  Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['parameters']
+  RestEndpointMethodTypes['repos']['createCommitStatus']['parameters']
 
-type CreateCommitStatusResponse = Endpoints['POST /repos/{owner}/{repo}/statuses/{sha}']['response']
+type CreateCommitStatusResponse = RestEndpointMethodTypes['repos']['createCommitStatus']['response']
 
 export async function createCommitStatus(
   client: GitHubClient,
@@ -22,10 +22,9 @@ export async function createCommitStatus(
   return response.data
 }
 
-type ListRepositoryPullRequestsParameters =
-  Endpoints['GET /repos/{owner}/{repo}/pulls']['parameters']
+type ListRepositoryPullRequestsParameters = RestEndpointMethodTypes['pulls']['list']['parameters']
 
-type ListRepositoryPullRequestsResponse = Endpoints['GET /repos/{owner}/{repo}/pulls']['response']
+type ListRepositoryPullRequestsResponse = RestEndpointMethodTypes['pulls']['list']['response']
 
 export async function listRepositoryPullRequests(
   client: GitHubClient,
@@ -34,11 +33,9 @@ export async function listRepositoryPullRequests(
   return await client.paginate(client.rest.pulls.list, options)
 }
 
-type GetPullRequestFilesParameters =
-  Endpoints['GET /repos/{owner}/{repo}/pulls/{pull_number}/files']['parameters']
+type GetPullRequestFilesParameters = RestEndpointMethodTypes['pulls']['listFiles']['parameters']
 
-type GetPullRequestFilesResponse =
-  Endpoints['GET /repos/{owner}/{repo}/pulls/{pull_number}/files']['response']
+type GetPullRequestFilesResponse = RestEndpointMethodTypes['pulls']['listFiles']['response']
 
 export async function getPullRequestFiles(
   client: GitHubClient,
@@ -47,11 +44,9 @@ export async function getPullRequestFiles(
   return await client.paginate(client.rest.pulls.listFiles, options)
 }
 
-type GetRepositoryContentParameters =
-  Endpoints['GET /repos/{owner}/{repo}/contents/{path}']['parameters']
+type GetRepositoryContentParameters = RestEndpointMethodTypes['repos']['getContent']['parameters']
 
-type GetRepositoryContentResponse =
-  Endpoints['GET /repos/{owner}/{repo}/contents/{path}']['response']
+type GetRepositoryContentResponse = RestEndpointMethodTypes['repos']['getContent']['response']
 
 export async function getRepositoryContent(
   client: GitHubClient,
@@ -66,11 +61,10 @@ export async function getRepositoryContent(
   }
 }
 
-type GetPullRequestParameters =
-  Endpoints['GET /repos/{owner}/{repo}/pulls/{pull_number}']['parameters']
+type GetPullRequestParameters = RestEndpointMethodTypes['pulls']['get']['parameters']
 
 type ListCommitStatusesResponse =
-  Endpoints['GET /repos/{owner}/{repo}/commits/{ref}/statuses']['response']
+  RestEndpointMethodTypes['repos']['listCommitStatusesForRef']['response']
 
 export async function getPullRequestStatuses(
   client: GitHubClient,
